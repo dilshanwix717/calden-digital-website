@@ -31,7 +31,15 @@ export function Footer() {
       <div className="mx-auto max-w-site px-5 py-16 desk:px-16 desk:py-24">
         <div className="grid grid-cols-2 gap-8 desk:grid-cols-[1.4fr_1fr_1fr_1fr] desk:gap-12">
           <div>
-            <Link href="/" aria-label={company.name} className="mb-4 flex items-baseline gap-2">
+            {/* No aria-label here — found by Lighthouse/axe in Phase 9:
+                aria-label="Calden Digital" didn't match the link's own
+                visible text ("Calden" + "Digital", the second span visually
+                uppercased via CSS only), which is exactly the
+                "label-content-name-mismatch" failure — screen-reader users
+                hear one thing while sighted users read another. The link's
+                own text content is already the correct accessible name, so
+                the label was redundant as well as wrong. */}
+            <Link href="/" className="mb-4 flex items-baseline gap-2">
               <span className="text-2xl font-semibold tracking-[-0.02em] text-on-band">
                 {company.shortName}
               </span>

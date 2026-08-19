@@ -2911,11 +2911,25 @@ advertised. `lastModified` comes from the MDX `updatedAt` for case studies and f
 constant for static pages. Set `changeFrequency` and `priority` conservatively
 (`monthly`, `0.8` for the homepage, `0.5` elsewhere). Do **not** include `/privacy`.
 
+*Turbopack puts CSS in `chunks/`, not a `css/` subdirectory — a Phase 9 note that
+also matters here.* If you write a size-limit or analyzer config assuming Webpack's
+`static/css/*.css` convention (see Phase 9), it silently matches nothing under
+Turbopack. Verify with `find .next/static -name "*.css"` before trusting a glob.
+
 *Robots.* `app/robots.ts`: allow all, point `sitemap` at
 `${siteUrl}/sitemap.xml`, disallow `/privacy`. Note: while the site is on a
 `*.vercel.app` preview domain, you may want a blanket disallow — add a check on
 `process.env.VERCEL_ENV !== "production"` returning `disallow: "/"`, so preview deploys
 are never indexed. That is worth doing now.
+
+*A real Rich Results Test issue, found in Phase 8.* `Organization.logo` and
+`LocalBusiness.image` were first pointed at the inline SVG logo
+(`/logo/calden-horizontal.svg`). Google's structured-data guidance specifies
+logo/image as a raster format (JPEG/PNG/WebP) — SVG here is a documented
+source of a Rich Results Test warning, even though the identical file
+renders correctly as the favicon and the inline nav logo elsewhere. Point
+both fields at the generated default OG PNG instead (1200×630, already
+exists once Phase 8's OG-image step runs, includes the mark).
 
 *JSON-LD.* One `<script type="application/ld+json">` per page, rendered by a small
 server component using `dangerouslySetInnerHTML` with `JSON.stringify`. Do **not** use
@@ -3050,18 +3064,32 @@ JavaScript weight is what actually regresses. Point it at the built client chunk
 assert the budget's numbers. Use `@size-limit/file` — **not** the webpack or esbuild
 preset, which would rebuild rather than measure what Next actually emitted.
 
+**Two path corrections found running this in Phase 9.** First, `.next/static/css/*.css`
+matches nothing — Turbopack emits CSS inside `.next/static/chunks/`, not a separate
+`css/` directory (that's a Webpack-era convention). Use
+`.next/static/chunks/**/*.css`. Second, `"limit": "120 KB"` on the aggregate-glob entry
+is not achievable and was never meant to be — the plan's own next sentence says this
+glob "will read high," and it does: it sums the shared framework runtime plus every
+route's page-specific code together, which measured 206–212 KB gzip on this project
+with nothing wrong. Setting the literal 120 KB budget number here makes the check fail
+permanently regardless of any real regression, which defeats its purpose as a
+regression detector. Measure the actual aggregate once (`npx size-limit` with a
+deliberately generous limit) and set the ceiling a reasonable margin above that instead
+— on this project, 230 KB against a measured 211–212 KB baseline left enough headroom
+to still catch a real regression (verified: adding `lodash` to a client component
+pushed it to 237 KB and correctly failed) without being a tripwire on day one.
+
 ```json
 [
-  { "name": "First Load JS — /",         "path": ".next/static/chunks/**/*.js", "limit": "120 KB", "gzip": true },
-  { "name": "CSS — all routes",          "path": ".next/static/css/*.css",      "limit": "20 KB",  "gzip": true }
+  { "name": "All client JS chunks (ceiling, not per-route)", "path": ".next/static/chunks/**/*.js", "limit": "230 KB", "gzip": true },
+  { "name": "CSS — all routes",                              "path": ".next/static/chunks/**/*.css", "limit": "20 KB",  "gzip": true }
 ]
 ```
 
-A glob over all chunks is a **ceiling**, not a per-route figure, so it will read high.
-Refine it to per-route entries by reading `.next/app-build-manifest.json` and generating
-the config, or keep `scripts/check-budget.mjs` from the original plan as the per-route
-check and let size-limit guard the aggregate. **Do both** — they catch different
-regressions, and the per-route number is the one in the budget.
+This glob is a **ceiling**, not a per-route figure. Keep `scripts/check-budget.mjs` as
+the per-route check that actually enforces the budget document's 120 KB number — **do
+both**, they catch different regressions, and the per-route number is the one that
+matters.
 
 `scripts/check-budget.mjs`: read **`.next/diagnostics/route-bundle-stats.json`** —
 verified present in Next 16 with Turbopack — which lists `route`,
@@ -3123,6 +3151,34 @@ route from a running `pnpm start` and asserts, by parsing the HTML:
 - every `<a>` and `<button>` has discernible text or an `aria-label`
 - no `<a href="#">`
 - `<html lang="en">` present
+
+**A false positive to build in from the start, not discover the hard way.** An
+image-only link or button (`<a href="..."><img alt="..."/></a>`, no visible text, no
+`aria-label`) is a valid, common pattern — the image's `alt` text IS its accessible
+name. A naive check that only inspects an anchor's own text content and `aria-label`
+flags every one of these as broken. This project's work-index media links are exactly
+this pattern. Before asserting "no discernible text or aria-label", also check for a
+descendant `<img alt="...">` with non-empty alt text and treat that as satisfying the
+requirement.
+
+**Two real, load-bearing accessibility bugs this exact script (or the equivalent Lighthouse/axe
+run) will find, not from code review:**
+
+1. **`aria-hidden="true"` on a container with focusable descendants is WAI-ARIA-invalid**
+   — a sighted keyboard user can still Tab into content assistive tech is told doesn't
+   exist. If your mobile nav panel hides itself with `aria-hidden` while its links and
+   close button remain in the tab order (CSS `opacity`/`pointer-events` alone doesn't
+   remove them from the DOM's focus order), this fails. Use the native `inert` attribute
+   instead — `inert={!open}` on the panel removes the whole subtree from both the
+   accessibility tree and tab order in one property, with no per-child JS.
+2. **An `aria-label` that doesn't match the element's own visible text is a
+   `label-content-name-mismatch` failure** — screen readers announce the label, sighted
+   users read the text, and if they disagree that's a confusing experience by definition.
+   A common way to trip this: writing `aria-label="Company Name"` on a link that already
+   contains the company name as visible text (e.g. a footer wordmark split across two
+   `<span>`s). If the visible text is already correct, delete the redundant label rather
+   than trying to make it match — one source of truth, and it can't drift out of sync
+   with a future copy change.
 
 *8. Gold usage check.* In the same script: `text-accent`, `--accent-gold` and
 `#D4AF37` may appear only in files on an allowlist — `components/layout/Footer.tsx`,

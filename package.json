@@ -13,9 +13,16 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "prebuild": "tsx scripts/validate-content.ts",
-    "validate": "tsx scripts/validate-content.ts"
+    "validate": "tsx scripts/validate-content.ts",
+    "analyze": "ANALYZE=true next build",
+    "check:budget": "node scripts/check-budget.mjs",
+    "size": "size-limit",
+    "check:a11y": "start-server-and-test start \"http://localhost:3000\" \"node scripts/check-a11y-static.mjs\"",
+    "lighthouse": "lhci autorun",
+    "check": "pnpm validate && pnpm build && pnpm check:budget && pnpm size && pnpm check:a11y"
   },
   "dependencies": {
+    "@vercel/speed-insights": "2.0.0",
     "gray-matter": "4.0.3",
     "next": "16.3.1",
     "next-mdx-remote": "6.0.0",
@@ -25,6 +32,9 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@lhci/cli": "0.15.1",
+    "@next/bundle-analyzer": "16.3.1",
+    "@size-limit/file": "13.0.3",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.20.1",
     "@types/react": "19.2.18",
@@ -33,6 +43,8 @@
     "eslint-config-next": "16.3.1",
     "playwright": "1.56.1",
     "sharp": "0.35.3",
+    "size-limit": "13.0.3",
+    "start-server-and-test": "3.0.12",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.12",
     "typescript": "6.0.3"

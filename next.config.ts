@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const nextConfig: NextConfig = {
   // AVIF first, WebP fallback. Required by the performance budget.
@@ -10,4 +11,5 @@ const nextConfig: NextConfig = {
   // errors to fail the build. Do not add them to unblock a broken build.
 };
 
-export default nextConfig;
+// Gated on ANALYZE=true so normal builds are unaffected. Run via `pnpm analyze`.
+export default withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" })(nextConfig);

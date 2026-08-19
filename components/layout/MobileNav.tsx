@@ -119,10 +119,17 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
         className={`fixed inset-y-0 right-0 z-40 flex w-[min(84vw,360px)] flex-col gap-6 bg-page px-6 py-5 shadow-none transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.2,0,0,1)] desk:hidden ${
           open ? "translate-x-0 opacity-100" : "pointer-events-none translate-x-4 opacity-0"
         }`}
-        // Hidden from the accessibility tree entirely while closed, on top
-        // of the visual hiding above — belt and braces for AT that ignores
-        // opacity/transform.
-        aria-hidden={!open}
+        // `inert` when closed — NOT aria-hidden. Found by Lighthouse/axe in
+        // Phase 9: aria-hidden="true" on a container that still holds
+        // focusable descendants (the nav links, the close button) is an
+        // invalid ARIA state — a sighted keyboard user can still Tab into
+        // content that's supposed to be entirely hidden from assistive
+        // tech, which is exactly the "[aria-hidden] elements contain
+        // focusable descendants" failure. `inert` is the correct native
+        // primitive: it removes the subtree from both the accessibility
+        // tree AND tab order in one attribute, with no extra JS needed to
+        // blur/disable each child by hand.
+        inert={!open}
       >
         <div className="flex items-center justify-between">
           <span className="t-caption text-subtle">Menu</span>

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "All client JS chunks (ceiling, not per-route — see scripts/check-budget.mjs for the per-route figure the budget actually specifies)",
+    "path": ".next/static/chunks/**/*.js",
+    "limit": "230 KB",
+    "gzip": true
+  },
+  {
+    "name": "CSS — all routes",
+    "path": ".next/static/chunks/**/*.css",
+    "limit": "20 KB",
+    "gzip": true
+  }
+]

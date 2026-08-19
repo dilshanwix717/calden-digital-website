@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Fast, deterministic checks — content validation, build, per-route
+  # budget, aggregate size ceiling, static accessibility. Runs on every PR.
+  checks:
+    name: Validate, build, budget, size, a11y
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate content
+        run: pnpm validate
+
+      - name: Build
+        run: pnpm build
+
+      - name: Per-route First Load JS budget
+        run: pnpm check:budget
+
+      - name: Aggregate bundle size ceiling
+        run: pnpm size
+
+      - name: Static accessibility + gold-usage check
+        run: pnpm check:a11y
+
+  # Lighthouse CI is slow and can wobble a few points on shared runners
+  # (docs/calden-performance-budget.md notes this explicitly) — kept as its
+  # own job so it can be disabled here without touching the fast checks
+  # above. Posts results as a PR comment via the LHCI action.
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run Lighthouse CI
+        run: pnpm lighthouse
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

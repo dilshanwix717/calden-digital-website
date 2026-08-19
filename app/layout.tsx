@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { ThemeScript } from "@/components/layout/ThemeScript";
 import { Footer } from "@/components/layout/Footer";
 import { Plausible } from "@/components/analytics/Plausible";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getSite } from "@/lib/content";
 import "./globals.css";
 
@@ -88,6 +89,11 @@ export default function RootLayout({
             Footer, so it sits on top of everything via its own fixed
             positioning. No other file needs to change. */}
         <Plausible />
+        {/* First-party, does not count against the 5 KB third-party
+            script budget. Reports real-user Core Web Vitals in the Vercel
+            dashboard once deployed — this is what covers real INP, since
+            Lighthouse only measures TBT as its lab proxy. */}
+        <SpeedInsights />
       </body>
     </html>
   );

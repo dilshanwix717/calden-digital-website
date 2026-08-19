@@ -501,3 +501,170 @@ instead — all required fields present on all three types.
 
 AC8 (Lighthouse SEO = 100) is measured in Phase 9, which is where Lighthouse
 CI is actually wired up.
+
+
+---
+
+## Phase 9 — 2026-08-19
+
+Tooling: `@next/bundle-analyzer`, `size-limit` + `@size-limit/file`,
+`@lhci/cli`, `@vercel/speed-insights`, `scripts/check-a11y-static.mjs`,
+`.github/workflows/ci.yml`. `playwright` + Chromium installed as a dev
+dependency specifically to drive the manual-audit-adjacent checks (theme
+toggle, focus outline, mobile menu, reduced motion) through a real browser
+rather than trust structural HTML alone.
+
+### Toolchain confirmation (repeats Phase 1, verified still true)
+
+| | |
+|---|---|
+| TypeScript | 6.0.3 |
+| Bundler | Turbopack (Next 16 default) |
+| Build time | ~2s warm, ~5s cold |
+
+### Final First Load JS — per route, brotli, production build
+
+| Route | Measured | vs 120 KB budget |
+|---|---|---|
+| `/` | 136.3 KB | over by 16.3 KB |
+| `/contact` | 129.7 KB | over by 9.7 KB |
+| `/about`, `/work`, `/work/[slug]` | 124.9 KB | over by 4.9 KB |
+| `/_not-found`, `/privacy`, `/services` | 118.7 KB | 1.3 KB spare |
+
+Not weakened to pass — the budget document is explicit that this isn't
+allowed. `pnpm check` genuinely fails at `check:budget` as a result; this is
+the accurate state of the project, reported rather than hidden. See
+README.md's "Performance" section for the framing and
+`docs/PRE-DEPLOY-CHECKLIST.md` for what this blocks.
+
+### Homepage total page weight (Network panel, cache disabled)
+
+Not separately re-measured beyond the JS figures above — the AC4 target
+(homepage ≤600 KB, case study ≤1.2 MB total first view, cache disabled) was
+not verified via a live Chrome DevTools session in this environment. The
+brotli JS figures above (136.3 KB for `/`) plus CSS (~9 KB) plus the
+currently-missing placeholder images account for most of first-view weight;
+flagged as unverified rather than asserted.
+
+### Two real accessibility bugs found by Lighthouse, not by inspection
+
+Both were genuinely invisible without running the actual audit tool — the
+code looked reasonable, and manual visual testing wouldn't have caught
+either:
+
+1. **`aria-hidden-focus` (weight 7, scored 0)** — `MobileNav`'s closed panel
+   used `aria-hidden="true"` while its descendants (nav links, close
+   button) remained focusable — a WAI-ARIA-invalid state where a sighted
+   keyboard user can Tab into content assistive tech is told doesn't exist.
+   Fixed by switching to the native `inert` attribute, which removes a
+   subtree from both the accessibility tree and tab order in one property
+   with no per-child JS needed.
+2. **`label-content-name-mismatch` (scored 0)** — the footer wordmark link
+   carried `aria-label="Calden Digital"`, which didn't match its own visible
+   text content ("Calden" + "Digital", the second span uppercased via CSS
+   only) — screen readers announce one thing, sighted users read another.
+   Fixed by removing the redundant `aria-label` entirely; the link's own
+   text is already the correct accessible name.
+
+**Accessibility went from 0.96 to a clean 1.00 on every page** after both
+fixes — verified by rebuilding and re-running the full Lighthouse CI suite.
+
+### Lighthouse CI — full results after both accessibility fixes
+
+Median of 3 runs, mobile preset, Slow 4G + 4x CPU throttling, against a
+production build (`pnpm build && pnpm start`), local machine — not the real
+Vercel deployment.
+
+| Route | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| `/` | 0.98 | 1.00 | 0.96 | 1.00 |
+| `/work` | 0.98 | 1.00 | 0.96 | 1.00 |
+| `/work/susila` | 0.98 | 1.00 | 1.00 | 1.00 |
+| `/services` | 0.98 | 1.00 | 1.00 | 1.00 |
+| `/about` | 0.98 | 1.00 | 0.96 | 1.00 |
+| `/contact` | 0.98 | 1.00 | 1.00 | 1.00 |
+
+Performance and SEO both pass their gates (≥0.95, 1.0) on every page.
+Best Practices' 0.96 on three pages is `console.error`s from project-cover
+and portrait images that don't exist yet (404/400 from `next/image`) — a
+content-completeness gap already on the pre-deploy checklist, not a code
+defect; confirmed by checking `public/images/work/` is genuinely empty.
+
+**Metric-level assertions**, same runs:
+
+| Metric | Budget | Typical measured | Status |
+|---|---|---|---|
+| TBT | ≤150ms | 80ms | pass |
+| FCP | ≤1200ms | ~900ms | pass |
+| CLS | ≤0.05 | 0 | pass |
+| Speed Index | ≤2500ms | ~900ms | pass |
+| **LCP** | **≤2000ms** | **2200–2500ms** | **fail — the only failing metric** |
+
+LCP investigated, not just reported: the LCP element on `/` is the hero
+subhead paragraph (plain text, no image, no custom-loaded resource beyond
+the already-loaded font). Its phase breakdown attributes 19% to TTFB
+(458ms) and **81% to "Render Delay"** — time between TTFB and the element
+actually painting, with no Load Delay or Load Time (there's no image/font
+fetch on the critical path for this element). TBT is only 80ms, so this
+isn't main-thread blocking in the conventional sense either. `render-
+blocking-resources` flags the page's own 8.6 KB CSS file costing ~159ms,
+which is normal for a `<link rel="stylesheet">` this size and not
+unusual to see. The most likely explanation is this environment: a local
+`next start` (no CDN, no edge caching, no HTTP/2 server push) under 4x CPU
+throttling compounds differently than Vercel's actual production
+infrastructure would. **Recommendation: re-measure LCP against the real
+Vercel deployment before treating this as a code-level problem** — it is
+flagged on the pre-deploy checklist rather than "fixed" here, because
+attempting to fix a measurement artifact from the wrong environment risks
+optimising for the wrong thing.
+
+### Deliberate regression tests (AC6) — all three confirmed working
+
+1. Added `text-accent` to a heading on `/about`: `pnpm check:a11y` failed,
+   correctly naming the file and the specific gold pattern matched. Reverted.
+2. Added a second `<h1>` to `/services`: `pnpm check:a11y` failed with
+   "expected exactly one `<h1>`, found 2". Reverted.
+3. Added `lodash` (real dependency, not a stub) to `ContactForm.tsx`:
+   `pnpm size` failed ("exceeded by 7.03 kB", 212.31 -> 237.03 KB gzip
+   against the 230 KB aggregate ceiling), and `scripts/check-budget.mjs`
+   showed the expected effect concentrated on the two routes that actually
+   carry the contact form (`/` +21.2 KB brotli, `/contact` +21.2 KB —
+   the other five routes barely moved). Both reverted; confirmed `pnpm
+   size` and `pnpm build` return to the pre-test numbers.
+
+### A false positive found and fixed in the check script itself
+
+`scripts/check-a11y-static.mjs`'s first version flagged the work-index
+media links (`<a><img alt="..."/></a>`, no visible text, image-only) as
+having no discernible accessible name — a genuine false positive, since an
+image's `alt` text IS the correct accessible name for an image-only link,
+exactly the pattern used there. Fixed by teaching the check to look for a
+descendant `<img alt="...">` when an anchor/button has no direct text and
+no `aria-label`, before flagging it. Re-verified against all seven pages
+after the fix: zero false positives, and the three deliberate-break tests
+above still correctly fail when the underlying issue is real.
+
+### CI workflow
+
+`.github/workflows/ci.yml`: two jobs. `checks` (fast, deterministic —
+validate, build, check:budget, size, check:a11y) runs on every PR to
+`main`. `lighthouse` is a separate job specifically so it can be disabled
+without touching the fast checks, per the budget document's own note that
+Lighthouse CI is slow and can wobble on shared runners. Not executed in
+this environment (no GitHub remote/Actions runner available here) — the
+workflow YAML is written and each individual step was verified locally by
+running the equivalent command directly (see the deliberate regression
+tests above and every `pnpm check:*` invocation throughout this phase).
+
+### Not verified in this environment
+
+- Live Google Rich Results Test (Phase 8's AC5) — no network access to
+  external validation services.
+- Real GitHub Actions run of `.github/workflows/ci.yml` — no GitHub
+  remote configured for this repository yet.
+- Vercel Speed Insights reporting real data — requires an actual production
+  deployment.
+- Forced-colors mode, full screen-reader pass (VoiceOver/NVDA) — Playwright
+  can drive Chromium's DOM/CSS state but does not fully emulate a screen
+  reader's announcement behaviour; both are on the pre-deploy checklist as
+  manual steps.
