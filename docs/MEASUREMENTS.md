@@ -283,3 +283,153 @@ by rebuilding and re-checking the h2 order.
 10. Device-frame images carry `dark:border dark:border-line` — confirmed in
     served HTML (16 occurrences on the case-study page across device frames,
     project cards and work-index media).
+
+
+---
+
+## Phase 6 — 2026-08-19
+
+Five new static routes: /services, /about, /contact, /privacy, /not-found.
+No new client components (WhatsAppFloating is built but not mounted).
+
+### A real cross-page accessibility bug, found by AC5
+
+The Footer (built in Phase 3) used `<h4>` for its column headings. On its
+own that's invisible — nobody audits a component in isolation for heading
+level relative to a page it doesn't know about yet. Phase 6's AC5 requires
+checking monotonic heading order on every page, and running that check
+surfaced a genuine violation on every single page: h1/h2 jumping straight to
+h4 at the footer, skipping h3 entirely.
+
+First fix attempt (h3) was itself wrong: it assumed every page has an h2
+above the footer. `/contact` doesn't — its content is only an h1 — so h3
+skipped a level there too (h1 -> h3). Corrected to h2, the only level valid
+after every page's h1 regardless of what content exists in between, since
+every page has at least an h1 and the footer is always last. Verified against
+all seven pages after the fix; all monotonic, all exactly one h1.
+
+### Acceptance criteria verified
+
+1. All five routes build static.
+2. `/work`, `/services`, `/about` show ContactCTA (h2 "Tell us about your
+   project"); `/contact` does not — confirmed by counting the CTA's specific
+   h2, not just page text (the h1 and h2 both contain that string, which a
+   naive text-count would conflate).
+3. `/does-not-exist` returns real HTTP 404 (`curl -I`), with nav and footer
+   present.
+4. Exactly one `<h1>` per page — all seven checked.
+5. Heading order monotonic on all seven pages — after the Footer fix above.
+6. `grep -rn "Colombo|Privacy Policy|hello@" app components | grep -v content`
+   → empty.
+7. WhatsAppFloating.tsx exists; no `import { WhatsAppFloating }` anywhere.
+8. Temporarily mounted WhatsAppFloating in app/layout.tsx: builds, renders
+   the floating button, zero edits to WhatsAppButton.tsx. Reverted.
+
+---
+
+## Phase 7 — 2026-08-19
+
+### First Load JS — per route (final, after the bundle-leak investigation below)
+
+| Route | brotli | vs 120 KB |
+|---|---|---|
+| `/` | **134.0 KB** | over by 14.0 KB |
+| `/contact` | **127.3 KB** | over by 7.3 KB |
+| `/about`, `/work`, `/work/[slug]` | 122.6 KB | over by 2.6 KB |
+| `/_not-found`, `/privacy`, `/services` | 116.4 KB | 3.6 KB spare |
+
+`/` and `/contact` are the only two routes carrying the contact form; the
+delta over Phase 6's ~121.4 KB baseline is the form's real cost:
+**+12.6 KB brotli on `/`**, ~+6 KB on `/contact` (already carrying its own
+page chrome cost that differs slightly from the homepage's).
+
+### A ~61 KB budget regression, found and fixed before it shipped
+
+First build after wiring the form measured **`/` at 182.6 KB brotli** — a
+~61 KB jump, dwarfing Phase 1's isolated 4.2 KB measurement for `zod/mini`.
+Investigated rather than accepted:
+
+1. Inspected the new chunk: 307 KB raw, containing recognisable strings from
+   `projects.json` (`susila`, `Susila Productions`) — the entire content
+   module had leaked into the client bundle.
+2. Root cause: `lib/contact-schema.ts` called `getSite()` at module scope to
+   build its Zod enums. `ContactForm.tsx` (the client component) imports
+   that schema, so importing it pulled `lib/content.ts`'s static imports of
+   **all five JSON content files** into the client bundle — not just the
+   `contactForm` slice the schema needs.
+3. Fixed by changing `lib/contact-schema.ts` to a factory function
+   (`buildContactSchema(options)`) taking the option arrays as parameters,
+   with no dependency on `lib/content.ts` at all. Rebuilt: `/` dropped to
+   134.0 KB — recovered ~48 KB, but still ~13 KB above the pre-form
+   baseline.
+4. Same investigation on the remainder found a second instance of the exact
+   same bug: `ContactForm.tsx` also imported `whatsappUrl` from
+   `lib/whatsapp.ts`, which *also* calls `getSite()` internally (for the
+   WhatsApp number and default message). Fixed by making `whatsappUrl` a
+   prop, built server-side in the two parent pages and passed down, exactly
+   like `contactForm` and `contactEmail`.
+5. Final chunk inspected directly: zero occurrences of any project-slug or
+   case-study string. Confirmed clean.
+
+**General lesson, not just a Phase 7 note:** any function a client component
+calls, directly or transitively, that itself calls `getSite()` (or reads any
+`@/content/*.json` import) pulls the *entire* content module into the
+client bundle — Next's tree-shaking does not see through a function call to
+prune unused object keys from a bundled JSON import. The fix pattern is
+consistent: server components own `getSite()` calls, client components
+receive only the specific values they need as props. Two-for-two so far in
+this codebase (`lib/contact-schema.ts`, `lib/whatsapp.ts`); worth an explicit
+check in Phase 9 for any future client component.
+
+### Acceptance criteria verified (real browser, Playwright + Chromium)
+
+1. `pnpm build`: `/` and `/contact` both static.
+2. Empty submit: all 6 fields get `aria-invalid="true"`, focus moves to Name.
+3. No `RESEND_API_KEY`, no `EMAIL_TRANSPORT`: error state shown, WhatsApp and
+   mailto links present INSIDE the alert, form values retained
+   (name/email/message text verified; all three `<select>`s verified
+   separately below), no success in any environment.
+4. `EMAIL_TRANSPORT=noop`: success state, `[contact:noop]` logged with all
+   six fields and the correct subject-line format.
+4b. Invalid `RESEND_API_KEY`: same generic error state shown to the visitor;
+   the real Resend rejection ("API key is invalid") appears only in the
+   server log.
+5. JavaScript fully disabled (Playwright `javaScriptEnabled: false`),
+   immediate submit: still succeeds — timing check correctly skipped, not
+   failed, for the missing `_ts`.
+6. Honeypot filled: visitor sees success; zero trace of the submission in
+   the server log (grepped for the test data — no match).
+7. Valid submission within 3 seconds of page load: silently accepted, zero
+   trace in the server log.
+8. Six submissions in a row: 1–5 succeed, 6 is the first to return the
+   rate-limit message — exactly the threshold specified.
+10. Same `ContactForm` on `/` (idPrefix="home") and `/contact`
+    (idPrefix="contact"), confirmed in source.
+
+AC9 (screen-reader announcement, full keyboard walkthrough) is structurally
+satisfied — `role="alert"`, `aria-describedby` wired to each field's message
+— but is a manual check per Phase 9's own audit process, not something a
+headless browser proves.
+
+### A second real bug found via Playwright, not inspection: form-clearing on failure
+
+`defaultValue=""` (uncontrolled inputs) was the first implementation,
+matching a common React pattern. Testing AC3 in a real browser showed the
+form clearing itself completely after a failed submission — a direct
+violation of "the form is never cleared on failure." Root cause: React 19's
+`useActionState` calls the native `form.reset()` after every action
+completes, success or failure, to mirror plain HTML form-submission
+semantics — this is documented behavior, and exactly what the plan's own
+pitfall list flagged ("uncontrolled inputs are preserved on the no-JS path
+automatically but not on the client path"), just not with enough detail to
+anticipate the exact mechanism. Fixed by converting every field to
+controlled (`value` + `onChange`) React state.
+
+Text inputs and the textarea were fixed by that alone. The three `<select>`
+elements needed a second fix: even controlled, their selected `<option>`
+did not reliably survive the native reset. Root-caused with a `reset` event
+listener in the browser confirming the native reset genuinely fires; fixed
+with a layout effect in `SelectField` that re-asserts `select.value = value`
+on every render, one-way-syncing React's source of truth back onto the DOM
+node after any external mutation. Verified: all three selects now retain
+their values through a failed submission.

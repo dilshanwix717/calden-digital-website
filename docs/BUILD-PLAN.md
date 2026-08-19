@@ -2507,6 +2507,17 @@ your review:
 Store a `lastUpdated` ISO date alongside. Flag clearly in the README that this is a
 draft for the owner's review, not legal advice.
 
+*A dependency worth stating up front: Footer's heading level.* Phase 3 built the
+footer with `<h4>` column headings, copying the design system's own markup. Phase 6's
+AC5 (heading order monotonic on every page) fails on **every** page because of it —
+Footer is the last thing on every page, and no page here reaches h3/h4 depth before it.
+Fix it to `<h2>` in `components/layout/Footer.tsx` before or during this phase, not
+after — `h2` is the only level valid after every page's `h1` regardless of what content
+exists in between (some pages, like `/contact`, have no `h2` of their own at all, so
+even `h3` is wrong). This is called out here because a phase built in isolation from
+Phase 6 has no way to know its heading choice will fail an acceptance criterion four
+phases later.
+
 *404.* `app/not-found.tsx`. Uses the full shell — nav, footer, page header treatment.
 Heading `Page not found`, a line explaining the page may have moved, and two links:
 `Go to the homepage` and `See our work`. Keep it in `site.json` under `notFound`.
@@ -2573,21 +2584,61 @@ error states — that still submits with JavaScript disabled.
 
 **Implementation notes**
 
-*Shared schema.* `lib/contact-schema.ts` has no `"use client"` and no `"use server"`,
-so both sides import the same object. The option enums are built from `site.json`:
+*Shared schema — READ THIS BEFORE WRITING IT, it is the single most consequential
+line in this phase.* `lib/contact-schema.ts` has no `"use client"` and no `"use server"`,
+so both sides import the same object. **Do not write `const { contactForm } = getSite()`
+at module scope in this file.** `ContactSchema.ts` (or whatever it's called) is imported
+by `ContactForm.tsx`, a client component — and `lib/content.ts` statically imports **all
+five JSON content files** at its own module scope. Calling `getSite()` from anywhere a
+client component reaches, even transitively through a schema file, drags the entire
+content module — `projects.json`, `services.json`, everything — into the browser
+bundle. Measured cost of getting this wrong, found in Phase 7: **~61 KB brotli**, taking
+`/` from ~121 KB to 182.6 KB. `zod/mini` itself, isolated, is 4.2 KB (Phase 1).
+
+Write it as a **factory function taking the option arrays as parameters** instead:
 
 ```ts
-const { contactForm } = getSite();
-export const ContactSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name.").max(100),
-  email: z.email("Please enter a valid email address.").max(200),
-  projectType: z.enum(contactForm.projectTypes as [string, ...string[]]),
-  timeline: z.enum(contactForm.timelines as [string, ...string[]]),
-  budget: z.enum(contactForm.budgets as [string, ...string[]]),
-  message: z.string().trim().min(20, "Please tell us a little more — 20 characters or so.").max(4000),
-});
-export type ContactInput = z.infer<typeof ContactSchema>;
+import * as z from "zod/mini"; // NOT classic zod — see 1.15b, measured 52.8 vs 4.2 KB
+
+export type ContactFormOptions = {
+  projectTypes: readonly [string, ...string[]];
+  timelines: readonly [string, ...string[]];
+  budgets: readonly [string, ...string[]];
+};
+
+export function buildContactSchema({ projectTypes, timelines, budgets }: ContactFormOptions) {
+  return z.object({
+    name: z.string().check(z.trim(), z.minLength(2, { error: "Please enter your name." }), z.maxLength(100)),
+    email: z.string().check(z.email({ error: "Please enter a valid email address." }), z.maxLength(200)),
+    projectType: z.enum(projectTypes, { error: "Please choose a project type." }),
+    timeline: z.enum(timelines, { error: "Please choose a timeline." }),
+    budget: z.enum(budgets, { error: "Please choose a budget range." }),
+    message: z.string().check(z.trim(), z.minLength(20, { error: "Please tell us a little more — 20 characters or so." }), z.maxLength(4000)),
+  });
+}
 ```
+
+`app/actions/contact.ts` (server, no bundle concern) calls `getSite()` and passes
+`contactForm` into `buildContactSchema`. `ContactForm.tsx` (client) receives
+`contactForm` as a **prop** from its server-rendered parent (`ContactSection.tsx`,
+`app/contact/page.tsx`) and builds its own copy of the schema from that prop for
+client-side validation — it never imports `getSite` at all.
+
+**This same trap exists in `lib/whatsapp.ts`.** `whatsappUrl()` calls `getSite()`
+internally too. If `ContactForm.tsx` imports it directly (e.g. for the error message's
+WhatsApp link), the same leak happens through a second door. Pass the built URL down as
+a `whatsappUrl` **prop** instead, computed server-side by the parent page, exactly like
+`contactForm`. Both leaks were found and fixed in Phase 7 — see
+`docs/MEASUREMENTS.md`'s "A ~61 KB budget regression" for the full trace. **The general
+rule this establishes: no client component, and nothing a client component imports —
+directly or transitively — may call `getSite()` or `getNavigation()`. Pass values down
+as props from the nearest server component instead.**
+
+Zod's Note: zod/mini's syntax differs from classic zod — `z.string().check(z.trim(),
+z.minLength(2, { error: "..." }))`, not `.trim().min(2, "...")`. `z.enum()` takes a
+plain readonly tuple of literals, not the classic `as [string, ...string[]]` cast alone
+— TypeScript still needs that cast when the source array is a plain `string[]` from
+JSON, but the mini API itself is otherwise the shape above.
 
 The honeypot and timestamp are **not** in this schema. They are read from `FormData`
 directly in the action, so they never appear in client validation and never leak into
@@ -2700,6 +2751,24 @@ const [state, formAction, isPending] = useActionState(submitContact, { status: "
 - `<form action={formAction} noValidate>`. Using `action` rather than `onSubmit` is what
   gives progressive enhancement: with JavaScript disabled the browser posts the form and
   React's server-action endpoint handles it.
+- **Every control must be CONTROLLED (`value` + `onChange`), not `defaultValue`.**
+  React 19's `useActionState` calls the native `form.reset()` after every action
+  completes — success **or failure** — to mirror plain HTML form-submission semantics.
+  An uncontrolled field (`defaultValue`) is wiped by that reset, which directly violates
+  "never clear the form on failure" below. This is documented React 19 behaviour, found
+  the hard way in Phase 7 via a real browser test — it does not show up in a build or a
+  typecheck, only in an actual failed submission. Hold every field's value in a single
+  `values` state object, validate against that object (not `FormData`) in
+  `handleSubmit`, and let each `<input>`/`<textarea>` read `value={values.x}`.
+- **`<select>` needs a second fix beyond being controlled.** Even with `value` +
+  `onChange`, a `<select>`'s selected `<option>` does not reliably survive the native
+  reset the same way an `<input>`'s value does — confirmed by attaching a `reset` event
+  listener and observing it fire. Fix: in the select's own component, add a layout
+  effect that re-asserts `selectRef.current.value = value` on every render, one-way
+  syncing React's controlled value back onto the DOM node after any external mutation.
+  Skipping this means every dropdown silently resets to its placeholder on a failed
+  submission while text fields correctly retain their values — an easy thing to miss if
+  you only manually test with text inputs.
 - The timestamp: `<input type="hidden" name="_ts" ref={tsRef} />`, and a `useEffect`
   that sets `tsRef.current.value = String(Date.now())` on mount. Not `defaultValue` —
   that would be baked into the static HTML at build time (see 1.14).

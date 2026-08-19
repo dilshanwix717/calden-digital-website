@@ -64,6 +64,11 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        {/* WhatsAppFloating (components/shared/WhatsAppFloating.tsx) is built
+            but deliberately not mounted — see BUILD-PLAN §Phase 6. To turn it
+            on: import it above and render <WhatsAppFloating /> here, after
+            Footer, so it sits on top of everything via its own fixed
+            positioning. No other file needs to change. */}
       </body>
     </html>
   );

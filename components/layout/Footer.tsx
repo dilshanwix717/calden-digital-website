@@ -8,6 +8,14 @@ import { whatsappUrl } from "@/lib/whatsapp";
  * the logo file — the handoff's design system sets it as type in
  * --text-on-dark on the footer specifically, because the dark lockup
  * variant was never supplied.
+ *
+ * Column headings are h2, not the design system's h4. First attempt was h3
+ * on the assumption every page has an h2 above the footer — wrong: /contact
+ * has none, so h3 skipped a level there (h1 -> h3). h2 is the only level
+ * that's valid after every page's h1 regardless of what page content
+ * exists in between, since every page has at least an h1 and the footer
+ * is always the last landmark. Found by Phase 6's cross-page heading-order
+ * check — see docs/MEASUREMENTS.md.
  */
 export function Footer() {
   const { company, contact, copyright } = getSite();
@@ -38,7 +46,7 @@ export function Footer() {
 
           {footerColumns.map((col) => (
             <div key={col.title}>
-              <h4 className="mb-4 t-caption text-accent">{col.title}</h4>
+              <h2 className="mb-4 t-caption text-accent">{col.title}</h2>
               <ul className="flex flex-col gap-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
