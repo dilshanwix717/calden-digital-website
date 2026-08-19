@@ -1,0 +1,235 @@
+{
+  "company": {
+    "name": "Calden Digital",
+    "shortName": "Calden",
+    "tagline": "Building the digital foundation for modern businesses",
+    "description": "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
+    "foundedYear": 2024
+  },
+  "contact": {
+    "email": "hello@calden.lk",
+    "replyTime": "We reply within a day.",
+    "locationShort": "Colombo, Sri Lanka",
+    "locationLong": "Based in Sri Lanka. Working with clients locally and worldwide.",
+    "contactPageNote": "Based in Sri Lanka, working with clients locally and worldwide. We reply within a day."
+  },
+  "whatsapp": {
+    "number": "94000000000",
+    "defaultMessage": "Hi Calden — I’d like to talk about a project.",
+    "label": "Message us on WhatsApp"
+  },
+  "socials": [],
+  "hero": {
+    "headline": "We design and build websites, web apps and custom software.",
+    "subhead": "A software studio in Sri Lanka. We work through the whole process — understanding what your business needs, designing it, and building it properly.",
+    "primaryCta": { "label": "Start a project", "href": "/contact" },
+    "video": {
+      "enabled": false,
+      "poster": { "src": "/video/hero-poster.jpg", "alt": "", "width": 1920, "height": 1080 },
+      "sources": {
+        "mobile": { "src": "/video/hero-720.mp4", "type": "video/mp4", "maxWidth": 819 },
+        "desktop": { "src": "/video/hero-1080.mp4", "type": "video/mp4" }
+      },
+      "scrimOpacity": 0.55
+    }
+  },
+  "homepage": {
+    "whatWeDo": { "heading": "What we do" },
+    "selectedWork": {
+      "heading": "Selected work",
+      "seeAllLabel": "See all work",
+      "seeAllHref": "/work"
+    },
+    "streaming": {
+      "heading": "We’ve built streaming platforms",
+      "body": "Video is one of the harder things to get right — it has to adapt to the viewer’s connection, and it has to do it without an infrastructure bill that sinks the business. We’ve delivered video-on-demand and live streaming for two media companies, on two different commercial models.",
+      "linkLabel": "See how we did it",
+      "linkHref": "/work/susila"
+    },
+    "whyCalden": {
+      "heading": "Why Calden",
+      "items": [
+        {
+          "title": "You talk to the person building it",
+          "body": "No account managers, no handover to someone junior. The person who plans your project is the person who builds it."
+        },
+        {
+          "title": "We plan before we build",
+          "body": "Every project starts with understanding the business and agreeing a scope in writing. You know what you’re getting before anything is made."
+        },
+        {
+          "title": "Built properly, so it can grow",
+          "body": "Custom code rather than a template with the logo swapped. Your site does what your business needs — and it can be changed as your business changes."
+        }
+      ]
+    },
+    "contact": {
+      "heading": "Tell us about your project",
+      "body": "New site, a system you need built, or you’re not yet sure what you need — send us a message and we’ll tell you honestly whether we can help."
+    }
+  },
+  "pageHeaders": {
+    "work": {
+      "eyebrow": "Selected work",
+      "title": "Work",
+      "lead": "Websites, web applications and custom software for businesses in Sri Lanka and abroad. Three we can talk about in detail."
+    },
+    "services": {
+      "eyebrow": "Services",
+      "title": "What we do",
+      "lead": "Web and software work leads. Everything else supports it. Here is each in more detail."
+    },
+    "about": {
+      "eyebrow": "About",
+      "title": "Calden is one person.",
+      "lead": "I design and build websites and software for businesses — from the first conversation through to launch and beyond."
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Tell us about your project",
+      "lead": "New site, a system you need built, or you’re not yet sure what you need — send us a message and we’ll tell you honestly whether we can help."
+    },
+    "privacy": {
+      "eyebrow": "Privacy",
+      "title": "Privacy policy",
+      "lead": null
+    }
+  },
+  "contactCta": {
+    "heading": "Tell us about your project",
+    "body": "New site, a system you need built, or you’re not yet sure what you need — send us a message and we’ll tell you honestly whether we can help."
+  },
+  "servicesPage": {
+    "takeover": {
+      "heading": "Taking over an existing project",
+      "body": "If you have a build that stalled — a developer who stopped replying, or a project that’s nearly there but not working — we can take it over. We audit what exists, tell you honestly what it needs, and finish it. Two of the projects in our work started this way."
+    }
+  },
+  "aboutPage": {
+    "portrait": {
+      "src": "/images/about-portrait.jpg",
+      "alt": "Dilshan Wickramasinghe, founder of Calden Digital",
+      "width": 1000,
+      "height": 1250
+    },
+    "name": "Dilshan Wickramasinghe",
+    "role": "Developer & founder, Calden Digital",
+    "bio": [
+      "Calden Digital is one person. I started it to do software properly for businesses that had been let down by templates, by agencies that hand you to someone junior, or by developers who stopped replying halfway through.",
+      "I work across the whole thing — understanding the problem, designing the solution, writing the code, and staying on after launch. Because it’s one person, nothing gets lost in a handover, and you always know who you’re talking to."
+    ],
+    "pullQuote": {
+      "statement": "You talk to the person who builds it.",
+      "support": "No account managers. No handover. The person who plans your project is the person who builds it."
+    },
+    "howIWork": {
+      "heading": "How I work",
+      "items": [
+        {
+          "title": "Plan before build",
+          "body": "Every project starts with understanding your business and agreeing a scope in writing. You know what you’re getting before anything is made."
+        },
+        {
+          "title": "Honest about scope",
+          "body": "If something isn’t worth building, or isn’t something I can do well, I’ll say so. A clear no is worth more than a vague yes."
+        },
+        {
+          "title": "Built to last",
+          "body": "Custom code, kept simple, and structured so it can change as your business changes."
+        }
+      ]
+    },
+    "location": {
+      "heading": "Where we are based",
+      "body": "Based in Colombo, Sri Lanka. Working with clients here and abroad."
+    }
+  },
+  "contactForm": {
+    "projectTypes": ["Website", "Web application", "Custom software", "Ongoing support", "Not sure yet"],
+    "timelines": ["As soon as possible", "Within 1–3 months", "3–6 months", "Flexible"],
+    "budgets": ["Under $2,000", "$2,000 – $5,000", "$5,000 – $10,000", "$10,000+", "Not sure yet"],
+    "labels": {
+      "name": "Name",
+      "email": "Email",
+      "projectType": "Project type",
+      "timeline": "Timeline",
+      "budget": "Budget range",
+      "message": "Message"
+    },
+    "placeholders": {
+      "name": "Your name",
+      "email": "you@company.com",
+      "projectType": "Select one",
+      "timeline": "Select one",
+      "budget": "Select a range",
+      "message": "A few lines about what you need."
+    },
+    "submitLabel": "Send message",
+    "replyHint": "We reply within a day.",
+    "successHeading": "Message sent.",
+    "successBody": "Thanks — we’ll get back to you within a day.",
+    "errorMessage": "We couldn’t send your message just now. Please reach us on WhatsApp or email hello@calden.lk — we’ll pick it up straight away.",
+    "rateLimitMessage": "Too many messages from this connection. Please try again in a few minutes, or message us on WhatsApp."
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "body": "The page you’re looking for may have moved or no longer exists.",
+    "homeLabel": "Go to the homepage",
+    "workLabel": "See our work"
+  },
+  "privacy": {
+    "lastUpdated": "2026-08-19",
+    "sections": [
+      {
+        "heading": "Who we are",
+        "body": "Calden Digital is a software studio based in Colombo, Sri Lanka. You can reach us at hello@calden.lk."
+      },
+      {
+        "heading": "What we collect",
+        "body": "Only what you send through the contact form: name, email address, project type, timeline, budget range and your message. Nothing else is collected, and there is no account system."
+      },
+      {
+        "heading": "Why we collect it",
+        "body": "To reply to your enquiry and, if we work together, to discuss the project. The lawful basis is your consent, given by submitting the form."
+      },
+      {
+        "heading": "How long we keep it",
+        "body": "Enquiry emails are retained for as long as needed to respond and for our own records, and deleted on request."
+      },
+      {
+        "heading": "Who else sees it",
+        "body": "The form is delivered by Resend, our email provider, and the site is hosted by Vercel. Neither uses the content of your message for anything else. No data is sold or shared with advertisers."
+      },
+      {
+        "heading": "Analytics",
+        "body": "We use Plausible Analytics, which is cookie-free and does not track individuals or build profiles. It records aggregate page views, referrers and country. No personal data is collected and nothing is shared across sites."
+      },
+      {
+        "heading": "Cookies",
+        "body": "We set no cookies for tracking. The only browser storage the site uses is a single localStorage entry remembering your light or dark theme choice."
+      },
+      {
+        "heading": "WhatsApp",
+        "body": "If you contact us on WhatsApp, that conversation is governed by WhatsApp’s own privacy policy, not this one."
+      },
+      {
+        "heading": "Your rights",
+        "body": "You may ask what we hold about you, ask for it to be corrected, or ask us to delete it. Email hello@calden.lk."
+      },
+      {
+        "heading": "Changes",
+        "body": "The date this policy was last updated appears at the top of this page."
+      }
+    ]
+  },
+  "seo": {
+    "siteUrl": "https://calden.lk",
+    "defaultTitle": "Calden — Web design and software development in Sri Lanka",
+    "titleTemplate": "%s — Calden Digital",
+    "defaultDescription": "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
+    "defaultOgImage": { "src": "/images/og/default.png", "width": 1200, "height": 630, "alt": "Calden Digital" },
+    "twitterHandle": null
+  },
+  "analytics": { "plausibleDomain": null },
+  "copyright": "© 2026 Calden"
+}

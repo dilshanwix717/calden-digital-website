@@ -1,0 +1,34 @@
+[
+  {
+    "slug": "websites",
+    "index": "01",
+    "title": "Websites",
+    "lead": "Fast, well-built sites that work properly on a phone. Easy for your team to update, and set up so people can actually find you.",
+    "body": "We build the site around one job: helping a visitor decide you’re worth contacting. Clear structure, quick pages, and content your team can change without calling us. Search and analytics are set up from the start, so you can see what’s working and what isn’t.",
+    "includes": ["Marketing & content sites", "Landing pages", "SEO groundwork", "Analytics setup"]
+  },
+  {
+    "slug": "web-applications",
+    "index": "02",
+    "title": "Web applications",
+    "lead": "Booking systems, dashboards, admin panels, internal tools. Software shaped around how your business already works, rather than forcing you to change how you work.",
+    "body": "We start from the process you already run and build the screens your staff actually use and the reports you actually read. It is built to be maintained rather than to impress — so it keeps working long after launch.",
+    "includes": ["Booking & scheduling", "Dashboards", "Admin panels", "Internal tools"]
+  },
+  {
+    "slug": "custom-software",
+    "index": "03",
+    "title": "Custom software",
+    "lead": "When off-the-shelf doesn’t fit, we build what does — designed around your process, and built so it can grow with you.",
+    "body": "Some problems have no product you can buy. We design and build the thing you actually need, keep it simple enough to run day to day, and structure it so it can change as your business does.",
+    "includes": ["Bespoke systems", "Integrations", "Data & reporting", "APIs"]
+  },
+  {
+    "slug": "ongoing-support",
+    "index": "04",
+    "title": "Ongoing support",
+    "lead": "Hosting, updates, changes and improvements after launch. Someone to call when something needs doing.",
+    "body": "Launch is not the end of the work. We stay on to keep things running, make changes as they come up, and improve the parts that matter — so the site or system keeps earning its place.",
+    "includes": ["Hosting", "Maintenance", "Changes", "Improvements"]
+  }
+]

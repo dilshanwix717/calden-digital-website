@@ -1853,15 +1853,42 @@ wire it as `"prebuild": "tsx scripts/validate-content.ts"`. Now an unreferenced 
 newly added content file is still checked. It should print a one-line success summary
 (`✓ 5 JSON files, 3 case studies`) and `process.exit(1)` on failure.
 
-*MDX.* `lib/mdx.ts` reads `content/case-studies/*.mdx` with `fs` at build time (this
-runs only in RSC during static generation, never at request time), splits frontmatter
-with `gray-matter`, validates it with `CaseStudyFrontmatterSchema`, and compiles the
-body with `next-mdx-remote/rsc`'s `<MDXRemote />`.
+*MDX — split frontmatter parsing from body compilation, found necessary in Phase 2.*
+`lib/mdx.ts` reads `content/case-studies/*.mdx` with `fs` at build time (runs only in
+RSC during static generation, never at request time).
+
+**`next-mdx-remote/rsc` cannot be imported from `scripts/validate-content.ts`.** It pulls
+in `@mdx-js/mdx` → `estree-util-build-jsx` → `estree-walker@3`, which ships an ESM-only
+`exports` map with no `require` condition. `tsx`'s CJS path-alias resolver throws
+`ERR_PACKAGE_PATH_NOT_EXPORTED` the instant that chain is imported — reproduced with a
+probe script containing nothing but `import { compileMDX } from "next-mdx-remote/rsc"`,
+independent of any project code. Next's own bundler (Turbopack) resolves the same
+package fine; this is a `tsx`-only problem, verified by mounting a page that calls
+`compileMDX` and confirming `pnpm build && pnpm start` renders it correctly.
+
+So `lib/mdx.ts` exports two tiers:
 
 ```ts
-export async function getCaseStudy(slug: string): Promise<CaseStudy | null>
-export async function getAllCaseStudySlugs(): Promise<string[]>       // excludes draft
+// Frontmatter + raw body via gray-matter only. No MDX compilation. Safe under
+// tsx — this is what scripts/validate-content.ts calls.
+export function readCaseStudy(slug: string): CaseStudy | null
+export function getAllCaseStudySlugs(): string[]             // excludes draft
+export function getAllCaseStudyFrontmatter(): CaseStudyFrontmatter[]
+
+// Compiles the body to a React element via next-mdx-remote/rsc. Import this
+// ONLY from a Server Component (Phase 5's case-study page) — never from the
+// validate script.
+export async function compileCaseStudyBody(
+  body: string,
+  components?: Record<string, React.ComponentType>,
+): Promise<React.ReactElement>
 ```
+
+The practical effect: `pnpm validate` catches a missing field or a bad frontmatter type,
+but a body-level MDX **syntax** error is caught by `next build` itself, the same way any
+other compile error is — not by the prebuild gate. That is an acceptable boundary: syntax
+errors are rare and `next build` fails loudly on them; the gate's job is content shape,
+which it still covers completely.
 
 Frontmatter schema:
 
@@ -1938,6 +1965,12 @@ typographic apostrophe, and `encodeURI` leaves characters that break the link.
   not let them become plain hyphens.
 - **Compiling MDX with `@next/mdx`.** It routes MDX files as pages, which puts content
   inside `app/`. Use `next-mdx-remote/rsc`.
+- **Importing `next-mdx-remote/rsc` anywhere `tsx` will load it** — the validate script,
+  or any other `tsx`-run tool. It throws `ERR_PACKAGE_PATH_NOT_EXPORTED` on
+  `estree-walker`, unconditionally, regardless of what imports it. Keep frontmatter
+  parsing (`readCaseStudy`, `gray-matter`) and body compilation
+  (`compileCaseStudyBody`, `next-mdx-remote/rsc`) in separate exports, and only call the
+  second from a Server Component.
 
 ---
 ## Phase 3 — Layout: nav, mobile menu, footer, shared shell

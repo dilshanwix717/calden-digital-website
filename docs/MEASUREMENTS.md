@@ -91,3 +91,29 @@ Measured cost of that schema bundled for the browser (esbuild, minified):
 
 Classic Zod on the client is impossible — it alone is 6.7× the remaining brotli
 headroom. `zod/mini` fits. Options are written up in BUILD-PLAN §1.15b.
+
+
+---
+
+## Phase 2 — 2026-08-19
+
+Content-only phase; no client-side code, no route changes. First Load JS on `/`
+unchanged from Phase 1.
+
+### Content validated
+
+`pnpm validate`: 5 JSON files, 3 case studies (1 published — susila; 2 draft —
+landora, levelup-saloon), 4 services, 3 projects.
+
+### Finding: `next-mdx-remote/rsc` cannot be imported under `tsx`
+
+Discovered running `pnpm validate` for the first time. `tsx`'s CJS path-alias
+resolver throws `ERR_PACKAGE_PATH_NOT_EXPORTED` on `estree-walker@3` (an
+`@mdx-js/mdx` transitive dependency, ESM-only exports map) the instant
+`next-mdx-remote/rsc` is imported — reproduced in isolation, confirmed
+independent of this project's code, confirmed Next's own bundler is unaffected
+by mounting a page that calls `compileMDX` and rendering it under
+`pnpm build && pnpm start`. `lib/mdx.ts` now splits frontmatter parsing
+(`gray-matter`, safe under `tsx`) from body compilation
+(`next-mdx-remote/rsc`, Server-Component-only). See BUILD-PLAN §Phase 2 for
+the full writeup.

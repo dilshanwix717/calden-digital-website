@@ -1,0 +1,28 @@
+{
+  "primary": [
+    { "label": "Work", "href": "/work" },
+    { "label": "Services", "href": "/services" },
+    { "label": "About", "href": "/about" },
+    { "label": "Contact", "href": "/contact" }
+  ],
+  "navCta": { "label": "Start a project", "href": "/contact" },
+  "footerColumns": [
+    {
+      "title": "Pages",
+      "links": [
+        { "label": "Work", "href": "/work" },
+        { "label": "Services", "href": "/services" },
+        { "label": "About", "href": "/about" },
+        { "label": "Contact", "href": "/contact" }
+      ]
+    },
+    {
+      "title": "Contact",
+      "links": [
+        { "label": "hello@calden.lk", "href": "mailto:hello@calden.lk" },
+        { "label": "WhatsApp", "href": "whatsapp" }
+      ]
+    }
+  ],
+  "legal": [{ "label": "Privacy", "href": "/privacy" }]
+}

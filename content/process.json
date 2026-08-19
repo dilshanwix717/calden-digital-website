@@ -1,0 +1,11 @@
+{
+  "heading": "How we work",
+  "intro": "We plan before we build. Every project moves through the same five steps.",
+  "steps": [
+    { "step": "1", "title": "Understand the business", "description": "We start with a conversation about what your business actually does and where it’s losing time or customers. Not a feature list — the problem underneath it." },
+    { "step": "2", "title": "Plan and scope", "description": "We map out what needs building and why, then put it in writing: what you’re getting, how long it takes, what it costs. Nothing starts until that’s agreed." },
+    { "step": "3", "title": "Design", "description": "We design the structure and the interface before writing code. You see it, comment on it, and change it while changing it is still cheap." },
+    { "step": "4", "title": "Build", "description": "Regular progress you can look at and respond to. No disappearing for six weeks and hoping it’s what you wanted." },
+    { "step": "5", "title": "Launch and after", "description": "Deployment, handover, training your team if needed — and support once it’s live." }
+  ]
+}

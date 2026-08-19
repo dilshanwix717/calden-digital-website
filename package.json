@@ -11,12 +11,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prebuild": "tsx scripts/validate-content.ts",
+    "validate": "tsx scripts/validate-content.ts"
   },
   "dependencies": {
     "next": "16.3.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "4.4.3",
+    "next-mdx-remote": "6.0.0",
+    "gray-matter": "4.0.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
@@ -26,6 +31,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.1",
     "tailwindcss": "4.3.3",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "tsx": "4.23.12"
   }
 }

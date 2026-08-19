@@ -1,0 +1,77 @@
+---
+slug: "susila"
+title: "Susila"
+subtitle: "Rebuilding the streaming layer of a Sinhala film platform"
+summary: "Susila Productions had a subscription streaming platform that had already been built — and the streaming itself didn’t work properly. We were brought in to fix the part that mattered most. We rebuilt video delivery around adaptive streaming, added live broadcast, and integrated recurring subscription billing."
+facts:
+  role: "Sole developer on the rebuild. Brought in after the original team, working across the web client, the Node.js API, and the React admin panel."
+  timeline: "Roughly one month, part-time."
+  stack: "React, Vite, SCSS · Node.js REST API · MongoDB · HLS playback with Vimeo as origin · Stripe for recurring subscriptions · Firebase Cloud Messaging · deployed to AWS with GitHub-triggered CI/CD"
+decision:
+  eyebrow: "A decision worth explaining"
+  statement: "Keep Vimeo. Change how we use it."
+screens:
+  - frame: "browser"
+    url: "susila.lk/watch"
+    image:
+      src: "/images/work/susila-screen-desktop.jpg"
+      alt: "The custom HLS player playing a film, desktop"
+      width: 1280
+      height: 840
+    caption: "The custom HLS player — desktop"
+  - frame: "phone"
+    image:
+      src: "/images/work/susila-screen-mobile.jpg"
+      alt: "The Susila browse and home screen, mobile"
+      width: 804
+      height: 1560
+    caption: "Browse — mobile"
+quote:
+  text: null
+  attribution: "Susila Productions"
+anonymised: false
+draft: false
+publishedAt: "2026-01-15"
+updatedAt: "2026-01-15"
+ogImage: null
+---
+
+The platform existed. Audiences could sign up. But the video layer had been built in a way that couldn't scale or serve viewers well.
+
+Each film had been uploaded to Vimeo as **separate files per quality**, and playback ran through Vimeo's own embedded player. Two consequences followed. Viewers were locked to whichever quality they landed on — no adapting when a mobile connection dropped, so the video stalled instead of stepping down. And the platform had no real control over the playback experience, because the player belonged to someone else.
+
+For a service whose entire product is video, on an audience largely watching over mobile data in Sri Lanka, that's not a rough edge. That's the product not working.
+
+## What we built
+
+**Adaptive streaming playback.** We moved delivery onto **HLS** — pulling <Mono>.m3u8</Mono> manifests from Vimeo and playing them through a player built into the platform itself rather than a third-party embed. The playback engine is built on hls.js, which handles manifest parsing and adaptive bitrate switching; the player, its interface, and everything around it — controls, states, error handling, integration with the platform's entitlement checks — we built ourselves, working from the HLS specification and Vimeo's API documentation.
+
+The result: instead of a fixed file per quality, the stream steps up and down automatically with the viewer's connection. A weak signal softens the picture for a moment rather than stopping the film.
+
+**Live streaming.** Vimeo Live integrated directly into the platform, alongside the on-demand catalogue — a capability it hadn't had before.
+
+**Subscription billing.** Stripe integrated for recurring subscriptions, with entitlement checks tying an active subscription to what a viewer can watch.
+
+Alongside this we worked across the web client, the Node.js API, and the React admin panel used to manage the catalogue and subscribers.
+
+<DecisionBand>
+
+The obvious move when video delivery is broken is to take control of it — self-host, run your own transcoding, serve from your own CDN. It's also how you turn a fixable problem into an unbounded infrastructure bill. Transcoding is compute-heavy, storage grows forever, and bandwidth is the largest recurring cost in any streaming business.
+
+The actual problem wasn't Vimeo. Vimeo was already doing the expensive work — transcoding and CDN delivery — and doing it well. The problem was that the platform was consuming it in the least useful way: one static file per quality, played through someone else's embed.
+
+So we kept the origin and changed the consumption. Pulling the HLS manifests and playing them in our own player kept transcoding and bandwidth costs predictable, while moving playback control back inside the product — adaptive quality, and a player that behaves the way the platform needs it to.
+
+The trade-off is a continued dependency on a third party for the most critical part of the product. For a company running its first streaming service, that's the right trade: predictable monthly cost instead of an infrastructure project, with the budget going into the product.
+
+</DecisionBand>
+
+## Since then
+
+We've since built the same architecture for a second client — a video-on-demand service using one-time purchase rather than subscription, where a customer buys a title and can stream it indefinitely. Same delivery approach, different commercial model.
+
+## Outcome
+
+The platform went live. It hadn't been deployed before this work — adaptive playback, live streaming and recurring subscriptions all shipped as part of taking it to launch.
+
+Handed over to the client on completion.

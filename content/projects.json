@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "susila",
+    "displayOrder": 1,
+    "featured": true,
+    "title": "Susila",
+    "subtitle": "Rebuilding the streaming layer of a Sinhala film platform",
+    "cardTitle": "Susila — streaming platform",
+    "cardSummary": "A film streaming platform whose video delivery wasn’t working. We rebuilt it around adaptive playback, added live streaming, and took it to launch.",
+    "cardMeta": "One developer · one month",
+    "summary": "Susila Productions had a subscription streaming platform that had already been built — and the streaming itself didn’t work properly. We were brought in to fix the part that mattered most. We rebuilt video delivery around adaptive streaming, added live broadcast, and integrated recurring subscription billing.",
+    "tags": ["Web app", "Streaming"],
+    "role": "Sole developer on the rebuild",
+    "timeline": "Roughly one month, part-time",
+    "stack": ["React", "Node.js", "MongoDB", "HLS", "Stripe"],
+    "cover": { "src": "/images/work/susila-cover.jpg", "alt": "The Susila streaming platform playing a film in the custom HLS player", "width": 1600, "height": 1000 }
+  },
+  {
+    "slug": "landora",
+    "displayOrder": 2,
+    "featured": true,
+    "title": "Landora Tours",
+    "subtitle": "Full content site for a Sri Lankan tour operator",
+    "cardTitle": "Landora Tours — travel site",
+    "cardSummary": "Seventeen itineraries, thirty-plus experiences, an interactive island map, and multi-language support. Designed and built in two weeks.",
+    "cardMeta": "Design and build · two weeks",
+    "summary": "Landora Tours design private journeys across Sri Lanka for travellers from Europe, Australia and Asia. Almost all of their enquiries begin with a stranger abroad deciding whether this company looks trustworthy. We designed and built the entire site — seventeen itineraries, thirty-plus experiences, destination guides, an interactive island map, and a journal — with enquiry routed straight to WhatsApp.",
+    "tags": ["Website", "Multi-language"],
+    "role": "Design and build from scratch",
+    "timeline": "Two weeks",
+    "stack": ["Next.js", "Tailwind CSS", "Vercel"],
+    "cover": { "src": "/images/work/landora-cover.jpg", "alt": "The Landora Tours homepage showing an itinerary and the interactive island map", "width": 1600, "height": 1000 }
+  },
+  {
+    "slug": "levelup-saloon",
+    "displayOrder": 3,
+    "featured": true,
+    "title": "LevelUp Saloon",
+    "subtitle": "Inherited a saloon management platform mid-flight and shipped it on deadline",
+    "cardTitle": "LevelUp Saloon",
+    "cardSummary": "A booking and management system days from its deadline with unresolved defects. We audited the system end to end, found what was breaking it, and delivered on schedule.",
+    "cardMeta": "Audit and delivery · shipped on time",
+    "summary": "A saloon management SaaS was days from delivery with defects the original developers hadn’t been able to resolve. We came in cold, audited the entire system end to end, found three real bugs — including one that silently broke appointment editing for every user — fixed them, and delivered on the original date.",
+    "tags": ["Rescue", "Web app"],
+    "role": "Audit and delivery",
+    "timeline": "3–5 days, against a fixed deadline",
+    "stack": ["Next.js", "TypeScript", "Supabase", "Zod"],
+    "cover": { "src": "/images/work/levelup-saloon-cover.jpg", "alt": "The LevelUp Saloon dashboard showing the appointment calendar", "width": 1600, "height": 1000 }
+  }
+]
