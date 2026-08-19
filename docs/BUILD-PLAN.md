@@ -229,19 +229,26 @@ point it becomes the LCP element with `priority` and `fetchPriority="high"`. Bot
 states are built in Phase 4; only the flag changes. Phase 9 measures LCP in the
 shipped (disabled) state.
 
-### 1.9 Font weight 500 — RESOLVED: map to 600
+### 1.9 Font weight 500 — RESOLVED in Phase 1: it is free, so keep it
 
-The design uses weight 500 for nav links, form labels, tag pills and the work-index fact
-labels. The brief allows 400 and 600 only, and the budget document independently
-confirms it: *"Two weights of Outfit only — SemiBold 600 and Regular 400. Latin subset.
-Every additional weight is roughly 25KB for a difference nobody will notice."*
+Originally decided as "map 500 to 600" to honour the brief's and the budget's
+two-weights rule. **Phase 1 measured it and the premise does not hold.**
 
-**Decision:** load 400 and 600, map every 500 usage to **600**. At 12–15px the
-difference is slight and 600 reads as the intended label weight. Budget allows 60 KB
-total and 30 KB per weight, which two Latin-subset `woff2` cuts fit comfortably.
+Outfit on Google Fonts is a **variable** font. `next/font` splits it by
+unicode-range, not by weight, so every declared weight resolves to the same files.
+Building with `["400","600"]` and with `["400","500","600"]` produces **byte-identical
+output** — same file hashes, 32,228 + 14,760 bytes either way.
 
-The variable-axis alternative is now off the table — it would restore 500, but the
-budget's wording is explicit about two weights.
+The budget document's rationale — *"every additional weight is roughly 25KB for a
+difference nobody will notice"* — is correct for static per-weight cuts and simply does
+not apply here. This is not a budget being weakened; the measured font transfer is
+**32.2 KB against a 60 KB budget**, and adding 500 changes it by zero bytes.
+
+**Decision:** load 400, 500 and 600. Nav links, field labels, tag pills and the
+work-index fact labels use the design's real 500 weight instead of being mapped to 600.
+
+Only the latin file (32.2 KB) is fetched for English content; latin-ext loads only if
+such a character appears.
 
 ### 1.10 Third project — RESOLVED: "LevelUp Saloon" everywhere
 
@@ -330,29 +337,68 @@ the variable unset and no key, every environment shows the error state.
 
 Turning it on for real is still one variable: set `RESEND_API_KEY`.
 
-### 1.16 Rate limiting on Vercel is best-effort only
+### 1.15b Shared Zod validation costs more than the remaining budget — decide before Phase 7
 
-There is no database in this stack. An in-memory counter lives in one serverless
-instance and resets on cold start, so it throttles a naive script and nothing more.
-**Default:** ship the in-memory limiter, document the limitation in the README, and
-treat the honeypot plus timing check as the real defence. Adding a durable store later
-means implementing one interface in `lib/rate-limit.ts`.
+Measured in Phase 1, because it is the largest single threat to the JS budget and it
+would have been discovered far too late in Phase 7.
 
-### 1.17 First Load JS of 120 KB is still the tightest number
+The brief asks for "a Zod schema shared between client and server validation". Bundling
+the actual contact schema for the browser (esbuild, minified):
 
-A bare Next 16 App Router route reports roughly 100–115 KB First Load JS before you
-write a line of code. That leaves on the order of 10–20 KB for the theme toggle, mobile
-nav, contact form, WhatsApp button and hero video controller **combined**.
+| | raw | gzip | brotli |
+|---|---|---|---|
+| `zod` (classic) | 319.9 KB | 63.3 KB | **52.8 KB** |
+| `zod/mini` | 12.4 KB | 4.6 KB | **4.2 KB** |
 
-The budget document adds two more gates that bear on the same thing: **TBT ≤ 150ms** and
-**INP ≤ 150ms**. Both are consequences of how much JavaScript hydrates, so the five
-client components are the whole ballgame.
+Remaining headroom on `/` after Phase 1 is **7.9 KB brotli**. Classic Zod on the client
+is 6.7× that. It is not affordable at any point in this build.
 
-**Approach:** Phase 1 records the measured empty-app baseline in the budget document,
-and every later phase reports its delta. Phase 9's `size-limit` config makes it
-automatic. If the baseline alone exceeds 120 KB, that is a budget conflict to raise
-immediately — the budget document is explicit that the answer is never to raise the
-number.
+**Options:**
+
+| | Client cost | Keeps "shared schema"? | Trade-off |
+|---|---|---|---|
+| **A. `zod/mini` both sides** | 4.2 KB | **yes** | Different authoring API (`.check()` rather than chained methods). Server bundle size is not budgeted, so using mini there too costs nothing and keeps one syntax. |
+| B. Classic on server, mini on client | 4.2 KB | partly | Two schema definitions that can drift — the exact failure the brief wanted to avoid. |
+| C. No client Zod | 0 KB | no | Server-only validation plus native HTML constraints (`required`, `type="email"`, `minlength`). Errors appear after the Server Action round-trip rather than instantly. Progressive enhancement already requires this path to work. |
+
+**Recommended: A.** One schema file in `zod/mini` syntax, imported by both the client
+component and the Server Action. Satisfies the brief's requirement literally, costs
+4.2 KB brotli, and leaves roughly 3.7 KB for the mobile nav and form UI.
+
+Phase 7 assumes A unless you say otherwise.
+
+### 1.17 MEASURED: the framework floor eats most of the 120 KB budget
+
+No longer a prediction. Phase 1 measured it.
+
+| Route | gzip | brotli | vs 120 KB |
+|---|---|---|---|
+| `/` | 130.9 KB | **112.1 KB** | gzip **over by 10.9** / brotli **7.9 spare** |
+| `/_not-found` | 130.0 KB | 111.3 KB | gzip over by 10.0 / brotli 8.7 spare |
+
+The bare scaffold, before a line of this project's code, was 135.7 KB gzip / 116.2 KB
+brotli. The numbers above are *lower* only because the scaffold's demo page was removed.
+**This is the Next 16 + React 19.2 floor, and almost none of it is ours to reduce.**
+
+The budget document says "**Gzipped or Brotli** transfer size", and Vercel serves Brotli
+to every modern browser. On that basis the site is compliant with 7.9 KB to spare — a
+legitimate reading of the budget's own wording, not a relaxation. On gzip it is not
+compliant and cannot be made so without leaving Next.
+
+**This needs your decision, and the budget document is explicit that the answer is never
+to quietly raise the number.** The three honest options:
+
+1. **Measure on Brotli** (what actually ships). Compliant today. Headroom 7.9 KB, which
+   with `zod/mini` (1.15b) leaves ~3.7 KB for the mobile nav and form UI. Tight but real.
+2. **Raise the JS budget** to something the framework can meet — 140 KB gzip / 120 KB
+   brotli would restore sane headroom. Your call to make, not mine.
+3. **Change the stack.** A framework with a smaller client runtime (Astro, or plain
+   static HTML) would put this site at a fraction of the number. That is a much larger
+   decision and contradicts the brief's stated stack.
+
+Phase 2 onward proceeds on **option 1** — brotli, tracked in `docs/MEASUREMENTS.md`
+every phase — unless you choose otherwise. Every remaining phase reports its delta so
+there is no surprise at Phase 9.
 
 ### 1.18 Two smaller notes
 
@@ -768,7 +814,6 @@ The budget document requires a written justification for any new dependency over
 | Package | Version | Why |
 |---|---|---|
 | `typescript` | **`6.0.3`** | newest version the toolchain supports — see 4.1 |
-| `typescript-native` (alias of `typescript@7.0.2`) | `7.0.2` | optional, fast local typecheck — see 4.2 |
 | `tailwindcss` / `@tailwindcss/postcss` | `4.3.3` | |
 | `@types/node` | `26.2.0` | |
 | `@types/react` / `@types/react-dom` | `19.2.18` / matching | |
@@ -845,9 +890,12 @@ without touching the build, by installing 7 under an alias:
 }
 ```
 
-`pnpm typecheck:fast` while you work; `pnpm typecheck` and `next build` are the
-authoritative answer. The alias is optional — drop it if the duplicate install annoys
-you. On a codebase this size the honest saving is a second or two.
+**Tried in Phase 1 and removed.** Both packages declare `bin: { tsc }`, so they collide
+in `node_modules/.bin/tsc` and pnpm links whichever it processed last — which was TS 7.
+`pnpm exec tsc --version` then reported **7.0.2** while `next build` correctly used 6.0.3
+via module resolution. A local typecheck silently running a different compiler from the
+build is exactly the kind of inconsistency that costs hours, and the honest saving on a
+codebase this size is a second or two. **Do not add the alias.**
 
 Two `tsconfig.json` settings that do matter for repeat runs:
 
@@ -1360,8 +1408,24 @@ cp -R /tmp/calden-scaffold/. .
 rm -rf /tmp/calden-scaffold
 ```
 
-`cp -R <src>/. <dest>` copies dotfiles (`.gitignore`, `.eslintrc`) as well as visible
-ones; `cp -R <src>/* <dest>` silently would not. Verify `.gitignore` arrived.
+**Strip the scaffold before copying.** `create-next-app` runs `git init` in its target
+directory, and `cp -R .../. .` would copy that `.git` straight over the repo you just
+created. It also writes files this project already owns. Delete these first:
+
+```bash
+rm -rf /tmp/calden-scaffold/.git \
+       /tmp/calden-scaffold/.next \
+       /tmp/calden-scaffold/node_modules \
+       /tmp/calden-scaffold/README.md \
+       /tmp/calden-scaffold/AGENTS.md \
+       /tmp/calden-scaffold/CLAUDE.md
+rm -f  /tmp/calden-scaffold/public/*.svg      # Next's demo icons
+```
+
+Then copy. `cp -R <src>/. <dest>` takes dotfiles (`.gitignore`) as well as visible ones;
+`cp -R <src>/* <dest>` silently would not. Verify `.gitignore` arrived.
+
+Also delete `app/favicon.ico` after copying — Phase 8 supplies the real one.
 
 Then pin every version from Section 4 exactly — replace every `^` range
 `create-next-app` writes, including the TypeScript one, which it will set to whatever
@@ -1618,6 +1682,18 @@ wordmark paths become `var(--logo-word)`. Inline, not `next/image`, because the 
 above the fold, must swap with the theme with zero flash, and would otherwise be a
 second above-the-fold request. Props: `height` (number) and `title` (string, goes in
 `<title>` inside the SVG with `role="img"`).
+
+*ESLint must ignore the design handoff.* `design_handoff_calden_site/` is
+React-18-in-the-browser prototype code and will produce ~30 errors if linted. Add it to
+`globalIgnores` in `eslint.config.mjs` alongside the eslint-config-next defaults. Read
+it, do not lint it, do not "fix" it.
+
+*Note on `eslint-config-next` 16.* It ships React Compiler-aware rules
+(`react-hooks/set-state-in-effect`, `react-hooks/immutability`) that are stricter than
+most models expect. Calling `setState` synchronously in an effect body is an **error**,
+not a warning. `ThemeToggle` is written with a ref and imperative attribute writes
+specifically to satisfy this, and it is better code for it — no component state, no
+re-render on mount or click.
 
 *Build guards, required by the budget document.* `next.config.ts` must **not** contain
 `typescript.ignoreBuildErrors` or `eslint.ignoreDuringBuilds`. `create-next-app` does not
@@ -2875,10 +2951,16 @@ the config, or keep `scripts/check-budget.mjs` from the original plan as the per
 check and let size-limit guard the aggregate. **Do both** — they catch different
 regressions, and the per-route number is the one in the budget.
 
-`scripts/check-budget.mjs`: read `.next/app-build-manifest.json`, map each route to its
-chunk files, gzip each unique file from `.next/static/`, sum per route, compare against
-120 KB. Print route, size and headroom; `process.exit(1)` on any breach. Do **not** parse
-`next build` stdout — the format changes between versions.
+`scripts/check-budget.mjs`: read **`.next/diagnostics/route-bundle-stats.json`** —
+verified present in Next 16 with Turbopack — which lists `route`,
+`firstLoadUncompressedJsBytes` and `firstLoadChunkPaths` per route. Compress each chunk
+and sum per route. `app-build-manifest.json` does **not** exist under Turbopack; do not
+look for it. Do **not** parse `next build` stdout either — Next 16 no longer prints
+route sizes at all.
+
+Compress with **Brotli at quality 11** as the primary figure (see 1.17), and report gzip
+alongside it. The `noModule` polyfill chunk is correctly absent from the stats file;
+modern browsers never fetch it, so it must not be counted.
 
 *3. Lighthouse CI.* `lighthouserc.js`, mobile preset, Slow 4G, 4× CPU,
 `numberOfRuns: 3`, median. Assert against the budget document exactly:
@@ -2986,8 +3068,8 @@ README's full contents are listed below.
 1. `pnpm check` runs `validate`, `build`, `check:budget`, `size` and `check:a11y` and
    exits 0.
 2. `pnpm lighthouse` passes every assertion in the table above on all six URLs.
-3. Every route reports First Load JS ≤ 120 KB gzipped, with the actual numbers pasted
-   into the README.
+3. Every route reports First Load JS ≤ 120 KB **brotli** (see 1.17), with the actual
+   numbers pasted into the README and appended to `docs/MEASUREMENTS.md`.
 4. Homepage total first view ≤ 600 KB; case study ≤ 1.2 MB. Measure in the Network panel
    with cache disabled, not from the build output.
 5. LCP ≤ 2.0s, CLS ≤ 0.05, TBT ≤ 150ms, FCP ≤ 1.2s, Speed Index ≤ 2.5s on `/`, median of

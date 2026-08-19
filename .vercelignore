@@ -1,0 +1,5 @@
+# Reference material and documentation — not needed at runtime, and the design
+# handoff bundle is a few hundred KB of prototype code that would otherwise be
+# uploaded on every deploy.
+design_handoff_calden_site
+docs

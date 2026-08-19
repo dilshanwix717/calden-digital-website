@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+/* Dark mode is class-based, not media-based: an inline script in <head> sets the
+   class before first paint, so there is never a flash of the wrong theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================================
+   Design tokens — Calden Digital
+   Source of truth: design_handoff_calden_site/_ds/.../tokens/*.css
+   Light palette is the handoff's shipped "mint" override.
+   Dark palette and the derived tokens are documented in docs/BUILD-PLAN.md §2.1,
+   with every pairing contrast-verified in §2.2. Do not adjust a value here to
+   fix a contrast failure — the component is using the wrong token.
+   ========================================================================= */
+
+:root {
+  /* Surfaces */
+  --surface-page: #EEF2F1;
+  --surface-card: #FAFBFB;
+  --surface-sunken: #E3E9E8;
+  --surface-band: #12312F;   /* emphasis bands: darker than the page */
+
+  /* Lines. --border is decorative only (1.31:1) and must never be the sole
+     boundary of a form control. Interactive edges use --border-control (3.55:1). */
+  --border: #CDD6D4;
+  --border-control: #748280;
+
+  /* Text */
+  --text-primary: #12312F;
+  --text-secondary: #4A5C59;
+  --text-subtle: #5A6965;
+  --text-on-band: #E9EFED;
+  --text-on-band-muted: #B0BAB9;
+
+  /* Brand */
+  --brand-teal: #0F5C5C;
+  --brand-teal-hover: #0C4A4A;
+  --brand-teal-active: #0A3E3E;
+  --brand-on-band: #3FAEA5;  /* teal ON a band. Never --teal-on-dark: it is 2.78:1 */
+  --text-on-brand: #FAFBFB;  /* text on a filled teal button */
+
+  /* Accent. Gold FAILS AA on light surfaces (1.86:1) — decoration only there.
+     On a band it is 6.63:1 and legitimate for text (footer headings). */
+  --accent-gold: #D4AF37;
+
+  --focus-ring: #0F5C5C;
+  --danger: #A6432F;
+  --success: #2F7D5B;
+
+  /* Logo — consumed by components/ui/Logo.tsx */
+  --logo-stroke: #0F5C5C;
+  --logo-accent: #D4AF37;
+  --logo-word: #0F5C5C;
+
+  /* Type scale — desktop */
+  --fs-display: 64px; --lh-display: 1.06; --tr-display: -0.022em;
+  --fs-h1: 48px;      --lh-h1: 1.10;      --tr-h1: -0.02em;
+  --fs-h2: 36px;      --lh-h2: 1.18;      --tr-h2: -0.015em;
+  --fs-h3: 24px;      --lh-h3: 1.28;      --tr-h3: -0.01em;
+  --fs-body-lg: 20px; --lh-body-lg: 1.6;
+  --fs-body: 17px;    --lh-body: 1.65;
+  --fs-small: 15px;   --lh-small: 1.55;
+  --fs-caption: 13px; --lh-caption: 1.4;  --tr-caption: 0.06em;
+
+  --measure: 68ch;
+
+  /* Motion — calm, no bounce */
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Type scale — mobile. Same variable names, so every consumer follows without
+   needing its own media query. Matches tokens/typography.css exactly. */
+@media (max-width: 640px) {
+  :root {
+    --fs-display: 40px; --lh-display: 1.08;
+    --fs-h1: 34px;      --lh-h1: 1.14;
+    --fs-h2: 28px;      --lh-h2: 1.20;
+    --fs-h3: 21px;      --lh-h3: 1.30;
+    --fs-body-lg: 18px; --lh-body-lg: 1.55;
+    --fs-body: 16px;    --lh-body: 1.62;
+    --fs-small: 14px;   --lh-small: 1.5;
+    --fs-caption: 12px; --lh-caption: 1.35;
+  }
+}
+
+/* ---------- Dark theme ---------- */
+.dark {
+  --surface-page: #0D1817;
+  --surface-card: #14211F;
+  --surface-sunken: #0A1312;
+  /* The band INVERTS: in light it is darker than the page, in dark it is lighter
+     than both page and card. Keeping ink here would give 1.30:1 and disappear. */
+  --surface-band: #1F3733;
+
+  --border: #23332F;
+  --border-control: #586F69;
+
+  --text-primary: #E9EFED;
+  --text-secondary: #A3B3AF;
+  --text-subtle: #7A8A86;
+
+  --brand-teal: #2E9B93;
+  --brand-teal-hover: #3FAEA5;
+  --brand-teal-active: #4CBDB3;
+  /* The dark-mode teal is LIGHT. Light text on it is 2.90:1 and fails; dark ink
+     is 5.37:1 and passes. A dark-mode primary button has dark text. */
+  --text-on-brand: #0D1817;
+
+  --accent-gold: #E0BE50;
+  --focus-ring: #2E9B93;
+  --danger: #E08D79;
+  --success: #5FBF95;
+
+  --logo-stroke: #2E9B93;
+  --logo-accent: #E0BE50;
+  --logo-word: #E9EFED;
+
+  /* --brand-on-band, --text-on-band and --text-on-band-muted are intentionally
+     NOT redefined: they are identical in both themes, so band components never
+     branch on theme. Only the band fill changes. */
+}
+
+/* ============================================================================
+   Tailwind theme mapping
+   `inline` is load-bearing: it makes utilities emit var(--surface-page) rather
+   than resolving to the literal at build time, which is what lets .dark cascade.
+   Without it dark mode silently does nothing.
+   ========================================================================= */
+@theme inline {
+  --color-page: var(--surface-page);
+  --color-surface: var(--surface-card);
+  --color-sunken: var(--surface-sunken);
+  --color-band: var(--surface-band);
+  --color-line: var(--border);
+  --color-line-control: var(--border-control);
+  --color-ink: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-subtle: var(--text-subtle);
+  --color-on-band: var(--text-on-band);
+  --color-on-band-muted: var(--text-on-band-muted);
+  --color-brand: var(--brand-teal);
+  --color-brand-hover: var(--brand-teal-hover);
+  --color-brand-active: var(--brand-teal-active);
+  --color-brand-on-band: var(--brand-on-band);
+  --color-on-brand: var(--text-on-brand);
+  --color-accent: var(--accent-gold);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+}
+
+@theme {
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  /* Exactly two breakpoints, matching the design:
+     sm   (640px, Tailwind default) — type scale and section padding
+     desk (820px, custom)           — layout: nav, grids, footer columns */
+  --breakpoint-desk: 820px;
+
+  --container-site: 1200px;  /* page container */
+  --container-band: 820px;   /* narrow centred bands */
+  --container-read: 760px;   /* case-study reading column */
+
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+@layer base {
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+
+  body {
+    background: var(--surface-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 2px solid teal at 3px offset — the design system's focus rule. Outline, not
+     box-shadow, because the brand forbids shadows and outline works in both
+     themes and in forced-colors mode. */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--brand-teal);
+    color: var(--text-on-brand);
+  }
+}
+
+/* Semantic type classes. In `components` so Tailwind utilities can still
+   override them; unlayered rules would beat every utility. */
+@layer components {
+  .t-display { font-size: var(--fs-display); line-height: var(--lh-display); letter-spacing: var(--tr-display); font-weight: 600; }
+  .t-h1      { font-size: var(--fs-h1);      line-height: var(--lh-h1);      letter-spacing: var(--tr-h1);      font-weight: 600; }
+  .t-h2      { font-size: var(--fs-h2);      line-height: var(--lh-h2);      letter-spacing: var(--tr-h2);      font-weight: 600; }
+  .t-h3      { font-size: var(--fs-h3);      line-height: var(--lh-h3);      letter-spacing: var(--tr-h3);      font-weight: 600; }
+  .t-lead    { font-size: var(--fs-body-lg); line-height: var(--lh-body-lg); font-weight: 400; }
+  .t-body    { font-size: var(--fs-body);    line-height: var(--lh-body);    font-weight: 400; }
+  .t-small   { font-size: var(--fs-small);   line-height: var(--lh-small);   font-weight: 400; }
+  .t-caption { font-size: var(--fs-caption); line-height: var(--lh-caption); letter-spacing: var(--tr-caption); font-weight: 600; text-transform: uppercase; }
+
+  /* Visually hidden until focused. */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--surface-card);
+    color: var(--brand-teal);
+    padding: 12px 20px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+  }
+  .skip-link:focus {
+    left: 16px;
+    top: 16px;
+  }
+}
+
+/* The design system's motion rule: calm and short. Anyone asking for less
+   motion gets none. The hero hexagons opt IN via prefers-reduced-motion:
+   no-preference rather than being disabled here. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
