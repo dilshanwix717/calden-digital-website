@@ -9,7 +9,7 @@ import { buildMetadata } from "@/lib/seo";
 // but its links should still be crawlable.
 export function generateMetadata(): Metadata {
   return buildMetadata({
-    title: "Privacy",
+    title: "Privacy Policy",
     description: "How Calden Digital handles the information you share through the contact form.",
     path: "/privacy",
     noindex: true,

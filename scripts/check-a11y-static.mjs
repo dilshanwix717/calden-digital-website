@@ -25,7 +25,7 @@ import path from "node:path";
 
 const BASE_URL = process.env.A11Y_BASE_URL ?? "http://localhost:3000";
 
-const ROUTES = ["/", "/work", "/work/susila", "/services", "/about", "/contact", "/privacy"];
+const ROUTES = ["/", "/work", "/work/susila", "/services", "/about", "/contact", "/faq", "/privacy"];
 
 const GOLD_PATTERNS = [/text-accent\b/, /--accent-gold/, /#D4AF37/i, /#E0BE50/i];
 const GOLD_ALLOWLIST = [

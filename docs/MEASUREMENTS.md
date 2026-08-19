@@ -668,3 +668,64 @@ tests above and every `pnpm check:*` invocation throughout this phase).
   can drive Chromium's DOM/CSS state but does not fully emulate a screen
   reader's announcement behaviour; both are on the pre-deploy checklist as
   manual steps.
+
+
+---
+
+## Post-Phase-9 revision — 2026-08-19
+
+Design and IA changes requested after the build was complete. No new phase;
+recorded here because two of them move measured numbers.
+
+### Dark mode deactivated (built, not deleted)
+
+`DARK_MODE_ENABLED` in `lib/theme.ts` gates `ThemeScript` (renders nothing,
+so the `dark` class is never added and every `dark:` variant goes inert).
+The `.dark` token block, `ThemeToggle` and all `dark:` variants are kept
+verbatim.
+
+The toggle is **commented out** in `Nav.tsx` rather than conditionally
+rendered, because `{DARK_MODE_ENABLED && <ThemeToggle />}` keeps the static
+import and still bundles the component. Measured both ways: conditional
+render shipped it at **+1.0 KB brotli on `/`** (136.4 vs 135.4) and ~+0.5 KB
+on every other route, for a component no visitor can reach. Commented out
+instead, with `DARK MODE (1/2)` / `(2/2)` markers and matching README steps.
+
+### First Load JS — after this round
+
+| Route | brotli | vs 120 KB |
+|---|---|---|
+| `/` | 135.4 KB | over by 15.4 KB |
+| `/contact` | 129.2 KB | over by 9.2 KB |
+| `/about`, `/work`, `/work/[slug]` | 124.0 KB | over by 4.0 KB |
+| `/_not-found`, `/faq`, `/privacy`, `/services` | 118.2 KB | 1.8 KB spare |
+
+Every route is ~1 KB lighter than at the end of Phase 9. The new `/faq`
+route lands in the cheapest tier with headroom. The budget overage on the
+heavier routes is unchanged in nature — still the framework floor plus the
+contact form, still the open question from §1.17.
+
+### Accessibility re-verified after the footer rewrite
+
+The footer was rebuilt from scratch (new markup, new interactive elements:
+four social links, three contact rows) and a new `/faq` page added using
+native `<details>`/`<summary>`. Ran real Lighthouse accessibility audits
+rather than trusting the static check alone:
+
+| Page | Accessibility |
+|---|---|
+| `/` (new footer) | **1.00** |
+| `/faq` (new page) | **1.00** |
+
+`scripts/check-a11y-static.mjs` also passes on all eight routes — `/faq` was
+added to its `ROUTES` list, which is easy to forget when adding a page.
+
+### Note on verification environment
+
+A `next dev` server was already running on port 3000 during this round, so
+the first pass of curl/Playwright checks was unknowingly hitting **dev**, not
+the production build — visible as an HMR client script and Next's dev-tools
+badge in the screenshots. Re-verified everything against a production server
+on port 3100 (dev server left untouched); zero dev artifacts there. Worth
+remembering: `pnpm start` fails with `EADDRINUSE` rather than taking over,
+so a stale dev server silently invalidates any "production" check on :3000.

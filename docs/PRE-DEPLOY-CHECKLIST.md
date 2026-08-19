@@ -7,6 +7,12 @@ See `README.md`'s "Known limitations" for the full detail behind each item.
 
 - [ ] `content/site.json`'s `whatsapp.number` replaced with the real number
       (E.164 digits, no `+`, no spaces) — currently `94000000000`, a placeholder.
+- [ ] `content/site.json`'s `socials` array updated with the real Facebook,
+      Instagram and TikTok profile URLs — currently placeholders pointing at
+      `/caldendigital` handles that have not been confirmed to exist. Delete
+      any entry you don't have a profile for; the footer renders whatever is
+      in the array. The WhatsApp entry needs no URL (it resolves from
+      `whatsapp.number`).
 - [ ] `content/site.json`'s `seo.siteUrl` updated from `https://calden.lk`
       once the domain is confirmed/registered — feeds `metadataBase`, every
       canonical URL, the sitemap, and JSON-LD `@id`s from one field.
@@ -55,8 +61,10 @@ See `README.md`'s "Known limitations" for the full detail behind each item.
       share of the current gap is "Render Delay" measured against a
       throttled local server, not confirmed against production infrastructure.
 - [ ] Final manual pass on the deployed production URL: keyboard traversal
-      of all seven pages, both themes at 390px and 1440px, `prefers-reduced-
-      motion: reduce`, 400% zoom at 390px, axe DevTools on all seven routes.
+      of all eight pages at 390px and 1440px, `prefers-reduced-motion:
+      reduce`, 400% zoom at 390px, axe DevTools on all eight routes. Light
+      theme only — dark mode is deactivated (`DARK_MODE_ENABLED` in
+      lib/theme.ts), so there is no second theme to check.
 
 ## Budget document integrity
 
@@ -70,26 +78,6 @@ edited to make a check pass. Recorded at Phase 0:
 | Recorded | 2026-08-19 (Phase 0) |
 
 Reverified at the end of Phase 9 (2026-08-19): **unchanged.**
-
-Verify at any time:
-
-```bash
-shasum -a 256 docs/calden-performance-budget.md
-```
-
-If this no longer matches, someone changed the budget. Find out who and why before
-trusting any passing check.
-
-## Budget document integrity
-
-The binding performance budget is `docs/calden-performance-budget.md`. It is never
-edited to make a check pass. Recorded at Phase 0:
-
-| | |
-|---|---|
-| SHA-256 | `10cadec25b00e317982d4960d602510db7d165dbce737afba85e197deff01a52` |
-| Size | 6960 bytes |
-| Recorded | 2026-08-19 (Phase 0) |
 
 Verify at any time:
 

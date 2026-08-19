@@ -1,33 +1,56 @@
+import { cn } from "@/lib/cn";
+
 /**
  * Calden Digital horizontal lockup.
  *
- * Inlined rather than served as a file for three reasons: it sits above the fold
- * in the nav, it must swap with the theme without a second request or a flash,
- * and an <img> cannot inherit CSS custom properties. The three brand colours are
- * wired to --logo-stroke / --logo-accent / --logo-word, which are redefined in
- * the .dark block of globals.css.
+ * Inlined rather than served as a file because it sits above the fold in the
+ * nav — an <img> would be a second request and a visible pop-in — and because
+ * an <img> cannot be recoloured for the dark footer without shipping a second
+ * asset. Source: public/logo/calden-digital-horizontal-teal-golddesc.svg,
+ * coordinates rounded to 2dp.
  *
- * Source: design_handoff_calden_site/assets/calden-digital-horizontal.svg,
- * coordinates rounded to 2dp (9,902 -> 5,054 bytes; ~2.1 KB gzipped).
- * Do not recolour, stretch or rotate it. Brand rule: keep clear space of at
+ * Brand rule: never recolour, stretch or rotate it, and keep clear space of at
  * least the height of the "C" on all sides.
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ *  TO CHANGE THE LOGO SIZE, edit the `height` props at the call sites:
+ *    • Navbar  -> components/layout/Nav.tsx   (LOGO SIZE marker)
+ *    • Footer  -> components/layout/Footer.tsx
+ *  Width is derived from height automatically, so the aspect ratio is safe.
+ * ─────────────────────────────────────────────────────────────────────────
  */
+
+const ASPECT = 307 / 146;
+
 type LogoProps = {
   /** Rendered height in px. Width follows the 307:146 aspect ratio. */
   height?: number;
+  /**
+   * "brand"  — teal mark + teal wordmark + gold descriptor (light surfaces).
+   * "onDark" — light mark + light wordmark + teal descriptor, for the footer
+   *            band. The brand teal (#0F5C5C) on the dark band (#12312F) is
+   *            1.4:1 — effectively invisible — which is why an on-dark tone
+   *            exists at all rather than reusing one lockup everywhere.
+   */
+  tone?: "brand" | "onDark";
   /** Accessible name. Pass "" to mark it decorative when adjacent text names it. */
   title?: string;
   className?: string;
 };
 
-export function Logo({ height = 30, title = "Calden Digital", className }: LogoProps) {
+export function Logo({
+  height = 30,
+  tone = "brand",
+  title = "Calden Digital",
+  className,
+}: LogoProps) {
   const decorative = title === "";
   return (
     <svg
       viewBox="0 0 307 146"
       height={height}
-      width={(307 / 146) * height}
-      className={className}
+      width={ASPECT * height}
+      className={cn(tone === "onDark" && "logo-on-dark", className)}
       role={decorative ? undefined : "img"}
       aria-hidden={decorative ? true : undefined}
       aria-label={decorative ? undefined : title}
@@ -63,7 +86,7 @@ export function Logo({ height = 30, title = "Calden Digital", className }: LogoP
       />
       <path
         d="M168.12 98.99V91.26H171.13Q171.99 91.26 172.72 91.54Q173.45 91.83 174 92.35Q174.54 92.88 174.85 93.58Q175.15 94.28 175.15 95.12Q175.15 95.95 174.85 96.66Q174.54 97.37 174 97.9Q173.46 98.42 172.73 98.7Q172 98.99 171.15 98.99ZM169.61 92.59V97.66H171.11Q171.86 97.66 172.42 97.35Q172.98 97.03 173.29 96.46Q173.61 95.89 173.61 95.11Q173.61 94.35 173.29 93.78Q172.97 93.22 172.41 92.9Q171.85 92.59 171.11 92.59ZM183.34 98.99V91.26H184.83V98.99ZM196.99 99.1Q196.17 99.1 195.45 98.8Q194.72 98.5 194.18 97.95Q193.64 97.4 193.33 96.68Q193.03 95.95 193.03 95.12Q193.03 94.27 193.34 93.55Q193.65 92.83 194.2 92.29Q194.75 91.74 195.48 91.44Q196.22 91.14 197.08 91.14Q198.04 91.14 198.84 91.49Q199.64 91.85 200.17 92.5L199.16 93.51Q198.79 93.04 198.26 92.79Q197.72 92.53 197.07 92.53Q196.33 92.53 195.76 92.86Q195.2 93.18 194.88 93.76Q194.56 94.34 194.56 95.11Q194.56 95.88 194.87 96.47Q195.19 97.06 195.73 97.39Q196.28 97.72 196.98 97.72Q197.71 97.72 198.22 97.45Q198.74 97.18 199.01 96.65Q199.16 96.37 199.22 96.03L196.89 96.01V94.71H200.83V94.92Q200.83 96.31 200.33 97.24Q199.84 98.17 198.98 98.63Q198.11 99.1 196.99 99.1ZM208.97 98.99V91.26H210.47V98.99ZM220.97 98.99V92.59H218.5V91.26H224.94V92.59H222.47V98.99ZM232.4 98.99 235.51 91.26H236.73L239.84 98.99H238.24L237.7 97.55H234.51L233.96 98.99ZM237.22 96.3 236.12 93.37 235 96.3ZM247.84 98.99V91.26H249.33V97.66H252.88V98.99Z"
-        fill="var(--logo-word)"
+        fill="var(--logo-accent)"
       />
     </svg>
   );

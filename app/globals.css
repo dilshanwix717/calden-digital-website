@@ -87,7 +87,12 @@
   }
 }
 
-/* ---------- Dark theme ---------- */
+/* ---------- Dark theme — DEACTIVATED, kept intact ----------
+   Nothing here is dead code by accident: dark mode is switched off via
+   DARK_MODE_ENABLED in lib/theme.ts, which stops ThemeScript from ever
+   adding the `dark` class. These tokens and every `dark:` variant in the
+   components stay exactly as built, so flipping that one flag back to true
+   restores the whole thing. Do not delete this block to "clean up". */
 .dark {
   --surface-page: #0D1817;
   --surface-card: #14211F;
@@ -122,6 +127,17 @@
   /* --brand-on-band, --text-on-band and --text-on-band-muted are intentionally
      NOT redefined: they are identical in both themes, so band components never
      branch on theme. Only the band fill changes. */
+}
+
+/* On-dark logo tone — see components/ui/Logo.tsx's `tone="onDark"`.
+   The brand teal (#0F5C5C) sits at ~1.4:1 on the dark band (#12312F), i.e.
+   effectively invisible, so the footer lockup swaps the mark and wordmark to
+   the band's light text colour and the descriptor to the on-band teal.
+   Gold is deliberately not used here — it reads harshly against the band. */
+.logo-on-dark {
+  --logo-stroke: var(--text-on-band);
+  --logo-word: var(--text-on-band);
+  --logo-accent: var(--brand-on-band);
 }
 
 /* ============================================================================

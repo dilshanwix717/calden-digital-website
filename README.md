@@ -52,7 +52,7 @@ copy change.
 
 | File | Controls | Appears on |
 |---|---|---|
-| `content/site.json` | Company info, contact details, WhatsApp number, hero copy, homepage section copy, every page's header (eyebrow/title/lead), the Services "taking over" block, the About page (portrait, bio, pull-quote, principles), the contact form's field labels/options/messages, the 404 page, the privacy policy, SEO defaults, analytics config | Every page |
+| `content/site.json` | Company info, contact details, WhatsApp number, social profile links, hero copy, homepage section copy, every page's header (eyebrow/title/lead), the Services "taking over" block, the About page (portrait, bio, pull-quote, principles), the contact form's field labels/options/messages, the FAQ questions and answers, the 404 page, the privacy policy, SEO defaults, analytics config | Every page |
 | `content/navigation.json` | Nav links, footer columns, footer legal links | Header, footer, every page |
 | `content/services.json` | The four service blocks (exactly 4 — enforced) | Homepage, `/services` |
 | `content/process.json` | The five "how we work" steps (exactly 5 — enforced) | Homepage |
@@ -79,6 +79,44 @@ fails with:
 content/site.json is invalid:
   • contact.email: Invalid input: expected string, received undefined
 ```
+
+## Logo, navigation and theming
+
+**Logo size** lives at the two call sites, not inside the component — the
+width always follows the lockup's aspect ratio, so it can't be stretched:
+
+| Where | File | Constant |
+|---|---|---|
+| Navbar | `components/layout/Nav.tsx` | `LOGO_HEIGHT_MOBILE` (36) / `LOGO_HEIGHT_DESKTOP` (46) |
+| Footer | `components/layout/Footer.tsx` | `LOGO_HEIGHT` (54) |
+
+The navbar is 60px tall on mobile and 76px on desktop, so roughly 40/52 is the
+practical ceiling before the lockup starts crowding the bar.
+
+The lockup is inlined as SVG (`components/ui/Logo.tsx`) rather than served as
+a file — it's above the fold, so an `<img>` would be a second request and a
+visible pop-in. It has two tones: `brand` (teal mark and wordmark, gold
+descriptor) for light surfaces, and `onDark` for the footer band, where the
+brand teal would sit at ~1.4:1 and be effectively invisible.
+
+**Dark mode is built but deactivated.** Nothing was deleted — the `.dark`
+token block in `app/globals.css`, `ThemeScript`, `ThemeToggle` and every
+`dark:` variant across the components are all intact. To bring it back:
+
+1. Set `DARK_MODE_ENABLED = true` in `lib/theme.ts` (re-enables the no-flash
+   theme script).
+2. Uncomment the two lines marked `DARK MODE (1/2)` and `DARK MODE (2/2)` in
+   `components/layout/Nav.tsx` (puts the toggle back in the navbar's
+   right-hand corner).
+
+The toggle is commented out rather than conditionally rendered because
+`{DARK_MODE_ENABLED && <ThemeToggle />}` still bundles the component for
+every visitor — measured at ~1 KB brotli per route of dead weight while the
+flag is off.
+
+It's off because a studio site doesn't need a theme switcher, and the dark
+palette needed more design attention than it was getting — the footer band in
+particular.
 
 ## How to write a case study
 
@@ -245,6 +283,13 @@ didn't, is in `docs/MEASUREMENTS.md` — appended after every phase.
   expanded paragraphs and "included" chips, the Work index's lead
   paragraph, and the entire About page were authored by the design
   assistant, not supplied by the client — review before launch.
+- **The social profile URLs are placeholders.** `content/site.json`'s
+  `socials` array points at `facebook.com/caldendigital`,
+  `instagram.com/caldendigital` and `tiktok.com/@caldendigital`, none of
+  which have been confirmed to exist. Replace them with the real profiles (or
+  delete the entries you don't have — the footer renders whatever is in the
+  array, including nothing). The WhatsApp entry uses the `whatsapp` sentinel
+  and resolves from `whatsapp.number`, so it needs no separate URL.
 - **The WhatsApp number and the domain are both placeholders.**
   `content/site.json`'s `whatsapp.number` is `94000000000` and `seo.siteUrl`
   is `https://calden.lk` — both need replacing with real values before

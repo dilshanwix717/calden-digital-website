@@ -37,7 +37,13 @@ export function organizationAndLocalBusinessJsonLd() {
         description: company.description,
         email: contact.email,
         foundingDate: String(company.foundedYear),
-        ...(socials.length > 0 ? { sameAs: socials.map((s) => s.href) } : {}),
+        // sameAs is for profile URLs the entity controls. The "whatsapp"
+        // sentinel isn't one (it resolves to a wa.me deep link, not a
+        // profile), so it's filtered out rather than resolved.
+        ...(() => {
+          const profiles = socials.filter((s) => s.href !== "whatsapp").map((s) => s.href);
+          return profiles.length > 0 ? { sameAs: profiles } : {};
+        })(),
       },
       {
         "@type": "LocalBusiness",
@@ -78,5 +84,19 @@ export function caseStudyJsonLd(frontmatter: CaseStudyFrontmatter, coverImage: s
     dateModified: frontmatter.updatedAt,
     author: { "@id": `${seo.siteUrl}/${ORG_ID}` },
     publisher: { "@id": `${seo.siteUrl}/${ORG_ID}` },
+  };
+}
+
+/** FAQPage structured data for /faq. Each answer is plain text, so it needs
+ * no HTML escaping beyond what JSON.stringify already does in JsonLd.tsx. */
+export function faqJsonLd(items: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
   };
 }

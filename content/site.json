@@ -18,23 +18,61 @@
     "defaultMessage": "Hi Calden — I’d like to talk about a project.",
     "label": "Message us on WhatsApp"
   },
-  "socials": [],
+  "socials": [
+    {
+      "platform": "facebook",
+      "label": "Facebook",
+      "href": "https://www.facebook.com/caldendigital"
+    },
+    {
+      "platform": "instagram",
+      "label": "Instagram",
+      "href": "https://www.instagram.com/caldendigital"
+    },
+    {
+      "platform": "tiktok",
+      "label": "TikTok",
+      "href": "https://www.tiktok.com/@caldendigital"
+    },
+    {
+      "platform": "whatsapp",
+      "label": "WhatsApp",
+      "href": "whatsapp"
+    }
+  ],
   "hero": {
     "headline": "We design and build websites, web apps and custom software.",
     "subhead": "A software studio in Sri Lanka. We work through the whole process — understanding what your business needs, designing it, and building it properly.",
-    "primaryCta": { "label": "Start a project", "href": "/contact" },
+    "primaryCta": {
+      "label": "Start a project",
+      "href": "/contact"
+    },
     "video": {
       "enabled": false,
-      "poster": { "src": "/video/hero-poster.jpg", "alt": "", "width": 1920, "height": 1080 },
+      "poster": {
+        "src": "/video/hero-poster.jpg",
+        "alt": "",
+        "width": 1920,
+        "height": 1080
+      },
       "sources": {
-        "mobile": { "src": "/video/hero-720.mp4", "type": "video/mp4", "maxWidth": 819 },
-        "desktop": { "src": "/video/hero-1080.mp4", "type": "video/mp4" }
+        "mobile": {
+          "src": "/video/hero-720.mp4",
+          "type": "video/mp4",
+          "maxWidth": 819
+        },
+        "desktop": {
+          "src": "/video/hero-1080.mp4",
+          "type": "video/mp4"
+        }
       },
       "scrimOpacity": 0.55
     }
   },
   "homepage": {
-    "whatWeDo": { "heading": "What we do" },
+    "whatWeDo": {
+      "heading": "What we do"
+    },
     "selectedWork": {
       "heading": "Selected work",
       "seeAllLabel": "See all work",
@@ -91,8 +129,13 @@
     },
     "privacy": {
       "eyebrow": "Privacy",
-      "title": "Privacy policy",
+      "title": "Privacy Policy",
       "lead": null
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Questions we get asked",
+      "lead": "Straight answers about how we scope, price and build. If yours isn’t here, message us — we’ll tell you honestly."
     }
   },
   "contactCta": {
@@ -145,9 +188,26 @@
     }
   },
   "contactForm": {
-    "projectTypes": ["Website", "Web application", "Custom software", "Ongoing support", "Not sure yet"],
-    "timelines": ["As soon as possible", "Within 1–3 months", "3–6 months", "Flexible"],
-    "budgets": ["Under $2,000", "$2,000 – $5,000", "$5,000 – $10,000", "$10,000+", "Not sure yet"],
+    "projectTypes": [
+      "Website",
+      "Web application",
+      "Custom software",
+      "Ongoing support",
+      "Not sure yet"
+    ],
+    "timelines": [
+      "As soon as possible",
+      "Within 1–3 months",
+      "3–6 months",
+      "Flexible"
+    ],
+    "budgets": [
+      "Under $2,000",
+      "$2,000 – $5,000",
+      "$5,000 – $10,000",
+      "$10,000+",
+      "Not sure yet"
+    ],
     "labels": {
       "name": "Name",
       "email": "Email",
@@ -227,9 +287,52 @@
     "defaultTitle": "Calden — Web design and software development in Sri Lanka",
     "titleTemplate": "%s — Calden Digital",
     "defaultDescription": "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
-    "defaultOgImage": { "src": "/images/og/default.png", "width": 1200, "height": 630, "alt": "Calden Digital" },
+    "defaultOgImage": {
+      "src": "/images/og/default.png",
+      "width": 1200,
+      "height": 630,
+      "alt": "Calden Digital"
+    },
     "twitterHandle": null
   },
-  "analytics": { "plausibleDomain": null },
-  "copyright": "© 2026 Calden"
+  "analytics": {
+    "plausibleDomain": null
+  },
+  "copyright": "© 2026 Calden",
+  "faq": {
+    "items": [
+      {
+        "question": "How much does a project cost?",
+        "answer": "It depends on what needs building, and we won’t pretend otherwise. A marketing site is a different job from a booking system. We scope the work first, put a fixed figure in writing, and you decide before anything starts. The contact form has budget brackets — pick the one that fits and we’ll tell you honestly what’s achievable in it."
+      },
+      {
+        "question": "How long does it take?",
+        "answer": "A content site is usually two to four weeks. A web application depends entirely on scope — we’ve delivered a full tour operator site in two weeks and rebuilt a streaming platform over about a month. You get a timeline in writing with the scope, and we tell you early if something threatens it."
+      },
+      {
+        "question": "Do you work with clients outside Sri Lanka?",
+        "answer": "Yes. We’re based in Colombo and work with clients here and abroad. Most communication is over email and WhatsApp, with calls when they’re useful. Time zones have not been a problem so far."
+      },
+      {
+        "question": "Can you take over a project someone else started?",
+        "answer": "Yes, and we’ve done it more than once. We audit what exists, tell you honestly what it needs, and finish it. Two of the projects in our work started that way — one was days from its deadline with unresolved defects when we came in."
+      },
+      {
+        "question": "Who actually does the work?",
+        "answer": "Calden is one person. The person who scopes your project is the person who writes the code and the person you talk to afterwards. No account managers, no handover to someone junior."
+      },
+      {
+        "question": "What happens after launch?",
+        "answer": "We stay on if you want us to — hosting, updates, changes and improvements. Launch is not the end of the work. If you’d rather take it in-house, we hand over cleanly with everything documented."
+      },
+      {
+        "question": "Will I be able to update the site myself?",
+        "answer": "Yes, for content. We build sites so your team can change text and images without calling us. Structural changes — new page types, new features — are where we come back in."
+      },
+      {
+        "question": "Do you design as well as build?",
+        "answer": "Yes. We design the structure and the interface before writing any code, so you can see it and change it while changing it is still cheap. If you already have a designer or a brand, we work to that instead."
+      }
+    ]
+  }
 }

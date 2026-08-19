@@ -107,7 +107,17 @@ export const SiteSchema = z.object({
     defaultMessage: z.string().min(1),
     label: z.string().min(1),
   }),
-  socials: z.array(z.object({ label: z.string().min(1), href: z.string().url() })),
+  // platform drives which brand glyph the footer renders (see
+  // components/layout/Footer.tsx's SOCIAL_ICONS map) — adding a platform here
+  // without adding its icon there is a type error, which is the point.
+  // href accepts the "whatsapp" sentinel so the number stays in one place.
+  socials: z.array(
+    z.object({
+      platform: z.enum(["facebook", "instagram", "tiktok", "whatsapp", "linkedin", "x"]),
+      label: z.string().min(1),
+      href: z.union([z.url(), z.literal("whatsapp")]),
+    }),
+  ),
   hero: z.object({
     headline: z.string().min(1),
     subhead: z.string().min(1),
@@ -147,6 +157,7 @@ export const SiteSchema = z.object({
     about: PageHeaderSchema,
     contact: PageHeaderSchema,
     privacy: PageHeaderSchema,
+    faq: PageHeaderSchema,
   }),
   contactCta: z.object({ heading: z.string().min(1), body: z.string().min(1) }),
   servicesPage: z.object({
@@ -174,6 +185,16 @@ export const SiteSchema = z.object({
   privacy: z.object({
     lastUpdated: z.iso.date(),
     sections: z.array(PrivacySectionSchema).min(1),
+  }),
+  faq: z.object({
+    items: z
+      .array(
+        z.object({
+          question: z.string().min(1),
+          answer: z.string().min(1),
+        }),
+      )
+      .min(1),
   }),
   seo: z
     .object({
