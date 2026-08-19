@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
 import { getSite, getNavigation } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
+import { buildMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Metadata {
+  return buildMetadata({
+    title: "Page not found",
+    description: "The page you're looking for may have moved or no longer exists.",
+    path: "/404",
+    noindex: true,
+  });
+}
 
 /**
  * Root-level app/not-found.tsx — the only place Next will catch a

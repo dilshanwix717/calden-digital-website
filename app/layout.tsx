@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { ThemeScript } from "@/components/layout/ThemeScript";
 import { Footer } from "@/components/layout/Footer";
+import { Plausible } from "@/components/analytics/Plausible";
+import { getSite } from "@/lib/content";
 import "./globals.css";
 
 /**
@@ -28,10 +30,26 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+const { seo } = getSite();
+
+/**
+ * metadataBase is the one setting every other page's relative URLs resolve
+ * against — OG images, canonicals via alternates.canonical in lib/seo.ts.
+ * Sourced from content/site.json's seo.siteUrl, which is a placeholder
+ * (calden.lk) until the domain is registered. Update that single field and
+ * this, the sitemap, robots.ts and every page's JSON-LD all follow.
+ *
+ * title/description here are the site-wide fallback; every page overrides
+ * them via buildMetadata() in lib/seo.ts. The homepage's own metadata
+ * export (app/page.tsx) still takes precedence over this default.
+ */
 export const metadata: Metadata = {
-  title: "Calden — Web design and software development in Sri Lanka",
-  description:
-    "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
+  metadataBase: new URL(seo.siteUrl),
+  title: {
+    default: seo.defaultTitle,
+    template: seo.titleTemplate,
+  },
+  description: seo.defaultDescription,
 };
 
 /**
@@ -69,6 +87,7 @@ export default function RootLayout({
             on: import it above and render <WhatsAppFloating /> here, after
             Footer, so it sits on top of everything via its own fixed
             positioning. No other file needs to change. */}
+        <Plausible />
       </body>
     </html>
   );

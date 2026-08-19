@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAdjacentProjects } from "@/lib/content";
+import { getAdjacentProjects, getProjectBySlug } from "@/lib/content";
 import { readCaseStudy, compileCaseStudyBody, getAllCaseStudySlugs } from "@/lib/mdx";
 import { Header } from "@/components/layout/Header";
 import { CaseStudyHeader } from "@/components/work/CaseStudyHeader";
@@ -11,6 +12,9 @@ import { ContactCTA } from "@/components/shared/ContactCTA";
 import { Section } from "@/components/ui/Section";
 import { proseComponents } from "@/components/ui/Prose";
 import { DecisionBand } from "@/components/work/DecisionBand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildMetadata } from "@/lib/seo";
+import { caseStudyJsonLd } from "@/lib/seo-json-ld";
 
 export async function generateStaticParams() {
   return getAllCaseStudySlugs().map((slug) => ({ slug }));
@@ -20,6 +24,36 @@ export async function generateStaticParams() {
 // render on demand — a dynamic fallback would make this route dynamic,
 // which violates the "no per-request SSR" rule for this site.
 export const dynamicParams = false;
+
+/**
+ * ogImage fallback chain: frontmatter.ogImage -> the project's cover image
+ * -> lib/seo.ts's own site-default fallback (buildMetadata handles the
+ * last step when `image` is undefined). Every case study currently has
+ * ogImage: null, so this resolves to `cover` today; setting a per-study
+ * ogImage in frontmatter later overrides it with no code change.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const study = readCaseStudy(slug);
+  if (!study || study.frontmatter.draft) return {};
+
+  const project = getProjectBySlug(slug);
+  const image = study.frontmatter.ogImage ?? project?.cover;
+
+  return buildMetadata({
+    title: study.frontmatter.title,
+    // Trimmed to ~155 chars — the conventional meta-description ceiling
+    // before search engines truncate it anyway.
+    description: study.frontmatter.summary.slice(0, 155),
+    path: `/work/${slug}`,
+    type: "article",
+    image,
+  });
+}
 
 export default async function CaseStudyPage({
   params,
@@ -38,8 +72,12 @@ export default async function CaseStudyPage({
     DecisionBand,
   });
 
+  const project = getProjectBySlug(slug);
+  const jsonLd = caseStudyJsonLd(frontmatter, frontmatter.ogImage?.src ?? project?.cover.src ?? "/images/og/default.png");
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <Header currentPath={`/work/${slug}`} />
       <CaseStudyHeader title={frontmatter.title} subtitle={frontmatter.subtitle} />
       <FactsStrip facts={frontmatter.facts} />

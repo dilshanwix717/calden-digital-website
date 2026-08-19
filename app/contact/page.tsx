@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getSite } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
 import { Section } from "@/components/ui/Section";
@@ -5,6 +6,16 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ContactActions } from "@/components/contact/ContactActions";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { buildMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Metadata {
+  const { pageHeaders } = getSite();
+  return buildMetadata({
+    title: pageHeaders.contact.title,
+    description: pageHeaders.contact.lead ?? "",
+    path: "/contact",
+  });
+}
 
 /**
  * No ContactCTA here — this page already is the contact experience; that

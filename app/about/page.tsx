@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getSite } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
@@ -5,6 +6,16 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { ContactCTA } from "@/components/shared/ContactCTA";
 import { Section } from "@/components/ui/Section";
 import { BandSection } from "@/components/shared/BandSection";
+import { buildMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Metadata {
+  const { pageHeaders } = getSite();
+  return buildMetadata({
+    title: pageHeaders.about.title,
+    description: pageHeaders.about.lead ?? "",
+    path: "/about",
+  });
+}
 
 /**
  * The only page that speaks in "I" instead of "we" — Calden's whole point

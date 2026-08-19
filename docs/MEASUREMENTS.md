@@ -433,3 +433,71 @@ with a layout effect in `SelectField` that re-asserts `select.value = value`
 on every render, one-way-syncing React's source of truth back onto the DOM
 node after any external mutation. Verified: all three selects now retain
 their values through a failed submission.
+
+
+---
+
+## Phase 8 — 2026-08-19
+
+All-server-side phase: metadata, sitemap, robots, JSON-LD, static OG images,
+icons, deferred analytics. Small bundle delta expected from the `Plausible`
+component's `next/script` import, present in the client bundle whether or
+not analytics is actually on (the component itself always ships; only the
+script tag it would render is conditional).
+
+### First Load JS — per route
+
+| Route | brotli | vs 120 KB | delta vs Phase 7 |
+|---|---|---|---|
+| `/` | 135.4 KB | over by 15.4 KB | +1.4 KB |
+| `/contact` | 128.7 KB | over by 8.7 KB | +1.4 KB |
+| `/about`, `/work`, `/work/[slug]` | 123.9 KB | over by 3.9 KB | +1.3 KB |
+| `/_not-found`, `/privacy`, `/services` | 117.7 KB | 2.3 KB spare | +1.3 KB |
+
+### A real Rich Results issue found and fixed before Phase 9's audit
+
+Initial JSON-LD pointed `Organization.logo` and `LocalBusiness.image` at the
+inline SVG logo (`/logo/calden-horizontal.svg`). Google's structured-data
+guidance specifies logo/image as a raster format (JPEG/PNG/WebP) — SVG here
+is a documented source of a Rich Results Test warning even though the same
+file renders correctly as a favicon and inline nav logo elsewhere on the
+site. Fixed by pointing both fields at the generated default OG PNG
+(1200×630, already exists, includes the mark) instead. No live validation
+against Google's tool was possible in this environment (no network access
+to external services); validated structurally against the documented
+required-field lists for Organization, LocalBusiness and CreativeWork
+instead — all required fields present on all three types.
+
+### Acceptance criteria verified
+
+1. `sitemap.xml`: exactly the 6 expected URLs (`/`, `/work`, `/work/susila`,
+   `/services`, `/about`, `/contact`); `/privacy`, `/work/landora`,
+   `/work/levelup-saloon` correctly absent.
+2. `robots.txt`: production build allows all + disallows `/privacy` +
+   points at the sitemap. Rebuilt with `VERCEL_ENV=preview` and confirmed
+   the blanket `Disallow: /` — this only takes effect when set at BUILD
+   time, since robots.ts is statically generated; Vercel sets this
+   automatically during its own build step, so the real deployment path is
+   correct.
+3. Canonical `<link>` present on all 7 pages, absolute URL, correct domain.
+4. All 6 required OG/Twitter tags present and non-empty on all 7 pages —
+   checked programmatically, not by eye. `/work/susila`'s `og:image`
+   correctly resolved through the ogImage -> cover fallback chain (its
+   frontmatter has `ogImage: null`).
+5. JSON-LD structurally valid, required fields present for Organization,
+   LocalBusiness (both on `/`) and CreativeWork (`/work/susila`) — live
+   Rich Results Test not reachable from this environment.
+6. `/privacy` and `/does-not-exist` both carry `noindex` (the 404 route
+   shows two robots meta tags — Next's implicit one plus this phase's
+   explicit one — both agreeing on noindex, so no conflict).
+7. No `plausible.io` reference with the env var unset. Set both
+   `analytics.plausibleDomain` (content) and `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`
+   (env) and rebuilt: the script is absent from the initial server HTML
+   entirely (afterInteractive defers it past hydration, which is even
+   better than a `defer` attribute on a server-rendered tag) — confirmed via
+   a `<link rel="preload">` reference. Reverted both.
+9. `grep -rn "google-analytics|gtag|googletagmanager"` across the whole
+   project (excluding node_modules and the design handoff) → empty.
+
+AC8 (Lighthouse SEO = 100) is measured in Phase 9, which is where Lighthouse
+CI is actually wired up.

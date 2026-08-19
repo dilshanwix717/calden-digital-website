@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getSite, getProjects } from "@/lib/content";
 import { getAllCaseStudyFrontmatter } from "@/lib/mdx";
 import { Header } from "@/components/layout/Header";
@@ -5,6 +6,16 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { ContactCTA } from "@/components/shared/ContactCTA";
 import { Section } from "@/components/ui/Section";
 import { ProjectRow } from "@/components/work/ProjectRow";
+import { buildMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Metadata {
+  const { pageHeaders } = getSite();
+  return buildMetadata({
+    title: pageHeaders.work.title,
+    description: pageHeaders.work.lead ?? "",
+    path: "/work",
+  });
+}
 
 export default function WorkPage() {
   const { pageHeaders } = getSite();

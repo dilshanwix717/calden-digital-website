@@ -1,7 +1,20 @@
+import type { Metadata } from "next";
 import { getSite } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Section } from "@/components/ui/Section";
+import { buildMetadata } from "@/lib/seo";
+
+// noindex, follow — a draft privacy policy pending review shouldn't rank,
+// but its links should still be crawlable.
+export function generateMetadata(): Metadata {
+  return buildMetadata({
+    title: "Privacy",
+    description: "How Calden Digital handles the information you share through the contact form.",
+    path: "/privacy",
+    noindex: true,
+  });
+}
 
 /**
  * DRAFT content, owner review required before launch — see the note at the

@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import { getSite, getServices } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ContactCTA } from "@/components/shared/ContactCTA";
 import { Section } from "@/components/ui/Section";
 import { Tag } from "@/components/ui/Tag";
+import { buildMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Metadata {
+  const { pageHeaders } = getSite();
+  return buildMetadata({
+    title: pageHeaders.services.title,
+    description: pageHeaders.services.lead ?? "",
+    path: "/services",
+  });
+}
 
 export default function ServicesPage() {
   const { pageHeaders, servicesPage } = getSite();
