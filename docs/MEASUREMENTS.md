@@ -117,3 +117,48 @@ by mounting a page that calls `compileMDX` and rendering it under
 (`gray-matter`, safe under `tsx`) from body compilation
 (`next-mdx-remote/rsc`, Server-Component-only). See BUILD-PLAN §Phase 2 for
 the full writeup.
+
+
+---
+
+## Phase 3 — 2026-08-19
+
+### First Load JS — per route
+
+| Route | raw | gzip | brotli | vs 120 KB | delta vs Phase 1 |
+|---|---|---|---|---|---|
+| `/` | 456.2 KB | 135.3 KB | **116.0 KB** | brotli **4.0 spare** | +3.9 KB brotli |
+| `/_not-found` | 451.3 KB | 133.5 KB | 114.5 KB | brotli 5.5 spare | +3.2 KB brotli |
+
+The full shared shell — Nav, MobileNav (the only new client component besides
+ThemeToggle), Footer, Button, WhatsAppButton, seven icon components, Container
+and Section — cost **3.9 KB brotli**. Headroom on `/` is now 4.0 KB, tighter
+than Phase 1's 7.9 KB but still compliant on the brotli reading (§1.17).
+
+`/` still renders as `○ (Static)`.
+
+### Acceptance criteria verified
+
+1. Nav and footer present on `/`, confirmed in served HTML; footer pinned to
+   viewport bottom via `flex flex-col` body + `flex-1` main (structural,
+   short-page visual check still worth a manual look).
+2. Nav height classes `h-[60px] desk:h-[76px]` confirmed in compiled CSS;
+   `min-width:820px` appears **exactly once** in the entire stylesheet — the
+   only layout breakpoint in the build.
+3. Skip link `<a href="#main" class="skip-link">Skip to content</a>` is the
+   first element in `<body>`, before Header/Nav.
+4. Mobile trigger ships `aria-expanded="false" aria-controls="mobile-nav-panel"
+   aria-label="Open menu"`; panel ships `role="dialog" aria-modal="true"
+   aria-label="Menu"` with a `aria-label="Close menu"` button inside. Focus
+   trap, Escape handling and scroll lock are implemented per spec; full
+   keyboard walkthrough is a manual check (Phase 9 audit).
+5. Scroll lock: `document.body.style.overflow` set/restored in a `useEffect`
+   keyed on `open`, restored on unmount as well as on close.
+6. `grep -rln '"use client"' components/layout` → exactly `MobileNav.tsx` and
+   `ThemeToggle.tsx`.
+7. `grep -rn 'wa\.me\|hello@calden\|"/work"' components | grep -v content` →
+   empty.
+8. `--accent-gold` computed values: `#d4af37` (light) / `#e0be50` (dark) in
+   the built CSS, applied via `text-accent` on the footer's "Digital" span —
+   `rgb(212,175,55)` / `rgb(224,190,80)` as specified.
+9. First Load JS reported above; within budget on the brotli reading.

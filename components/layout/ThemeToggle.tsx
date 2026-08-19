@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { THEME_STORAGE_KEY } from "./ThemeScript";
+import { Sun } from "@/components/icons/Sun";
+import { Moon } from "@/components/icons/Moon";
 
 const LABEL_TO_LIGHT = "Switch to light theme";
 const LABEL_TO_DARK = "Switch to dark theme";
@@ -29,7 +31,10 @@ function isDark() {
  *
  * 2. The accessible name is written imperatively after mount rather than held in
  *    state. The static HTML ships a neutral "Toggle theme", and there is no
- *    re-render on mount or on click. No component state exists at all.
+ *    re-render on mount or on click — no component state exists at all. (An
+ *    earlier version used useState here; eslint-config-next's React Compiler
+ *    rules flagged setState-in-effect and a use-before-declare, and this
+ *    imperative version is genuinely simpler, not just lint-compliant.)
  *
  * It follows the OS preference only while the visitor has stored no explicit
  * choice; once they click, the stored value wins.
@@ -88,51 +93,10 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       title="Toggle theme"
       className={`inline-flex h-9 w-9 items-center justify-center rounded-sm text-ink transition-colors duration-200 hover:text-brand ${className}`}
     >
-      <SunIcon />
-      <MoonIcon />
+      {/* `hidden dark:block` shows the sun in dark mode — the action the
+          button performs is "go light", so the sun is the target state. */}
+      <Sun className="hidden dark:block" />
+      <Moon className="block dark:hidden" />
     </button>
-  );
-}
-
-/* Both icons ship. `hidden dark:block` shows the sun in dark mode — the action
-   the button performs is "go light", so the sun is the target state. */
-function SunIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      className="hidden dark:block"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      className="block dark:hidden"
-    >
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
-    </svg>
   );
 }

@@ -1994,10 +1994,20 @@ accessible mobile menu, the theme toggle in place, and the dark footer — all d
 
 **Implementation notes**
 
-*Shell.* `app/layout.tsx` renders `<ThemeScript />`, `<a class="skip-link">`,
-`<Header />`, `<main id="main">{children}</main>`, `<Footer />`. `main` gets
-`flex: 1` inside a `min-h-screen flex flex-col` body so short pages still push the
-footer down.
+*Shell — resolved ambiguity.* As phrased above this contradicts itself: it says
+`app/layout.tsx` renders `<Header />`, but the very next section says `Nav` receives
+`currentPath` as a prop from **each page**, and a root layout has no access to the
+segment path without becoming a client component via `usePathname` — the exact thing
+"Active link state" below says not to do.
+
+**Resolution, built this way in Phase 3:** `app/layout.tsx` renders `<ThemeScript />`,
+the skip link, `<main id="main">{children}</main>`, and `<Footer />` — none of which are
+path-dependent. `<Header currentPath="..." />` is **not** in the root layout; each
+`page.tsx` renders it as the first element of its own return value, e.g.
+`<><Header currentPath="/work" />{...rest of the page}</>`. Six pages, one line each,
+zero client JavaScript for navigation. `main` is `flex flex-1 flex-col` inside a
+`flex min-h-screen flex-col` body, so short pages still push the footer down regardless
+of where Header ends up in the tree.
 
 *Container and Section.* These two components own all page-level spacing, so no page
 file ever writes a padding value.

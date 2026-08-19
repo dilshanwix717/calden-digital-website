@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { ThemeScript } from "@/components/layout/ThemeScript";
+import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
 /**
@@ -33,6 +34,19 @@ export const metadata: Metadata = {
     "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
 };
 
+/**
+ * Root shell. Header is intentionally NOT mounted here: Nav needs the
+ * current route to render aria-current and the teal underline, and a root
+ * layout has no access to the segment path without becoming a client
+ * component (usePathname) — which would drag the logo/links/CTA tree into
+ * the client bundle for a single visual detail (BUILD-PLAN §3, "Active link
+ * state"). Instead every page.tsx renders <Header currentPath="/its-path" />
+ * as the first thing inside <main>. Footer has no path dependency, so it
+ * lives here.
+ *
+ * <main> is flex:1 inside a flex-col body so short pages still push the
+ * footer to the bottom of the viewport (Phase 3, AC1).
+ */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -42,7 +56,15 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-screen">{children}</body>
+      <body className="flex min-h-screen flex-col">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <main id="main" className="flex flex-1 flex-col">
+          {children}
+        </main>
+        <Footer />
+      </body>
     </html>
   );
 }
