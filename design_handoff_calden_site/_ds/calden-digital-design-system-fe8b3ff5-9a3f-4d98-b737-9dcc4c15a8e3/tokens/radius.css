@@ -1,0 +1,18 @@
+/* Calden Digital — Radius & motion. Precise, restrained; no shadows. */
+:root {
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  --border-width: 1px;         /* @kind other */
+  --border-width-strong: 2px;  /* @kind other */
+
+  /* Motion — calm, no bounce */
+  --dur-fast: 120ms;   /* @kind other */
+  --dur: 200ms;        /* @kind other */
+  --dur-slow: 320ms;   /* @kind other */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);  /* @kind other */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);    /* @kind other */
+}

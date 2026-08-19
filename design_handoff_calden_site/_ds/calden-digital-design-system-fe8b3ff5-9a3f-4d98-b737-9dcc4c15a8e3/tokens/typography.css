@@ -1,0 +1,64 @@
+/* Calden Digital — Typography tokens
+   Outfit throughout. Headings SemiBold(600), tracked slightly tight.
+   Body Regular(400), comfortable measure (65–75ch). */
+:root {
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: var(--font-sans);
+  --font-heading: var(--font-sans);
+
+  --fw-regular: 400;   /* @kind font */
+  --fw-medium: 500;    /* @kind font */
+  --fw-semibold: 600;  /* @kind font */
+  --fw-bold: 700;      /* @kind font */
+
+  --measure: 68ch;     /* @kind other */ /* comfortable reading measure */
+
+  /* ---- Desktop font sizes ---- */
+  --fs-display: 64px;
+  --fs-h1: 48px;
+  --fs-h2: 36px;
+  --fs-h3: 24px;
+  --fs-body-lg: 20px;
+  --fs-body: 17px;
+  --fs-small: 15px;
+  --fs-caption: 13px;
+
+  /* ---- Line heights ---- */
+  --lh-display: 1.06;   /* @kind other */
+  --lh-h1: 1.10;        /* @kind other */
+  --lh-h2: 1.18;        /* @kind other */
+  --lh-h3: 1.28;        /* @kind other */
+  --lh-body-lg: 1.6;    /* @kind other */
+  --lh-body: 1.65;      /* @kind other */
+  --lh-small: 1.55;     /* @kind other */
+  --lh-caption: 1.4;    /* @kind other */
+
+  /* ---- Letter tracking ---- */
+  --tr-display: -0.022em;  /* @kind other */
+  --tr-h1: -0.02em;        /* @kind other */
+  --tr-h2: -0.015em;       /* @kind other */
+  --tr-h3: -0.01em;        /* @kind other */
+  --tr-body: 0;            /* @kind other */
+  --tr-caption: 0.06em;    /* @kind other */
+}
+
+@media (max-width: 640px) {
+  :root {
+    --fs-display: 40px;
+    --fs-h1: 34px;
+    --fs-h2: 28px;
+    --fs-h3: 21px;
+    --fs-body-lg: 18px;
+    --fs-body: 16px;
+    --fs-small: 14px;
+    --fs-caption: 12px;
+    --lh-display: 1.08;   /* @kind other */
+    --lh-h1: 1.14;        /* @kind other */
+    --lh-h2: 1.20;        /* @kind other */
+    --lh-h3: 1.30;        /* @kind other */
+    --lh-body-lg: 1.55;   /* @kind other */
+    --lh-body: 1.62;      /* @kind other */
+    --lh-small: 1.5;      /* @kind other */
+    --lh-caption: 1.35;   /* @kind other */
+  }
+}
