@@ -233,6 +233,31 @@
 /* The design system's motion rule: calm and short. Anyone asking for less
    motion gets none. The hero hexagons opt IN via prefers-reduced-motion:
    no-preference rather than being disabled here. */
+/* Hero hexagon pattern (components/home/Hero.tsx). Three rings, each its
+   own rotation direction and duration so they never resynchronise, plus a
+   shared 3% breathing scale. Transform-only, so it's GPU-composited and
+   costs nothing on the main thread. Opt-in via no-preference rather than
+   being switched off elsewhere, so a still frame is the reduced-motion
+   default with zero extra code. */
+@media (prefers-reduced-motion: no-preference) {
+  .hex-outer { animation: hex-spin-cw 87s linear infinite, hex-breathe 8s ease-in-out infinite; }
+  .hex-mid   { animation: hex-spin-ccw 79s linear infinite, hex-breathe 8s ease-in-out infinite 0.3s; }
+  .hex-inner { animation: hex-spin-cw 70s linear infinite, hex-breathe 8s ease-in-out infinite 0.6s; }
+}
+
+@keyframes hex-spin-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes hex-spin-ccw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+@keyframes hex-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.03; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

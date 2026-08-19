@@ -162,3 +162,124 @@ than Phase 1's 7.9 KB but still compliant on the brotli reading (§1.17).
    the built CSS, applied via `text-accent` on the footer's "Digital" span —
    `rgb(212,175,55)` / `rgb(224,190,80)` as specified.
 9. First Load JS reported above; within budget on the brotli reading.
+
+
+---
+
+## Phase 4 — 2026-08-19
+
+### First Load JS — per route
+
+| Route | raw | gzip | brotli | vs 120 KB | delta vs Phase 3 |
+|---|---|---|---|---|---|
+| `/` | 472.6 KB | 141.0 KB | **121.1 KB** | **OVER by 1.1 KB, even on brotli** | +5.1 KB brotli |
+| `/_not-found` | 451.3 KB | 133.5 KB | 114.4 KB | brotli 5.6 spare | -0.1 KB |
+
+### `/` crosses the 120 KB budget — flagged, not hidden
+
+Phase 3 left 4.0 KB of brotli headroom. The homepage's own markup and shared
+UI (Hero, WhatWeDo, HowWeWork, SelectedWork, StreamingBand, WhyCalden,
+ContactSection, Card, Tag, ProjectCard, BandSection, ContactActions) plus
+`HeroVideo` consumed 5.1 KB, tipping `/` **1.1 KB over budget on the brotli
+reading** — the reading Phase 1 proposed as compliant when gzip alone could
+not be met (§1.17).
+
+**Investigated whether this was a fixable bug before accepting it as real
+homepage weight:**
+
+1. `next/dynamic(() => import(".../HeroVideo"))` was tried first, per the
+   plan's own fallback suggestion ("guard the import with next/dynamic if
+   the budget measurement shows it mattering"). It made things **worse**
+   (121.1 -> 121.8 KB) — the loader wrapper adds its own overhead, and
+   Turbopack still lists the chunk in `firstLoadChunkPaths` for the route
+   because `hero.video.enabled` is a build-time-known content value, not a
+   runtime condition — there is nothing for a dynamic *runtime* import to
+   defer. Reverted.
+2. Stubbed `HeroVideo` to `return null` and remeasured: **120.6 KB**, only
+   0.5 KB less than the real 121.1 KB. HeroVideo's actual video-handling
+   logic is cheap. It is not the cause.
+3. Inspected the chunk Turbopack groups HeroVideo into
+   (`2tmg6nivxqgzb.js`, 6.7 KB brotli): it is the same chunk as `MobileNav`
+   and `ThemeToggle` from Phase 3 — Turbopack bundles sibling client
+   components together by default. That grouping, not HeroVideo's code, is
+   most of the 6.7 KB, and it was already present (smaller) in Phase 3's
+   116.0 KB.
+4. Counted internal `next/link`s rendered on `/`: only 4 top-level anchors
+   (nav links come from a shared component already counted). Not the driver.
+
+**Conclusion: this is real homepage weight, not a bundling defect.** A
+seven-section page with this much shared UI, against a 120 KB ceiling with
+only 4.0 KB of headroom after the shell alone, was always going to be tight
+— see §1.17's own warning that the framework floor leaves "on the order of
+10–20 KB for the theme toggle, mobile nav, contact form, WhatsApp button and
+hero video controller combined." The homepage additionally carries every
+other shared component in the design (services grid, process stepper,
+project cards, why-Calden grid, contact actions) on top of that list.
+
+**Not fixed in Phase 4.** Per your instruction to finish the plan before
+revisiting the budget, this is logged and left as-is. Options once the
+budget conversation resumes: raise the JS ceiling slightly (1.1 KB is a
+rounding-error-sized breach), split less-critical below-the-fold sections
+(WhyCalden, the contact form once Phase 7 lands) behind `next/dynamic` with
+a genuine runtime trigger (e.g. `IntersectionObserver`, not a build-time
+boolean) rather than a static prop, or accept it — Google's own Core Web
+Vitals thresholds do not hard-fail at 120 KB, this project's budget document
+does.
+
+
+---
+
+## Phase 5 — 2026-08-19
+
+### First Load JS — per route
+
+| Route | raw | gzip | brotli | vs 120 KB |
+|---|---|---|---|---|
+| `/` | 473.8 KB | 141.5 KB | 121.5 KB | over by 1.5 KB |
+| `/work` | 471.8 KB | 140.9 KB | 121.0 KB | over by 1.0 KB |
+| `/work/[slug]` (susila) | 471.8 KB | 140.9 KB | 121.0 KB | over by 1.0 KB |
+| `/_not-found` | 452.5 KB | 133.9 KB | 114.8 KB | 5.2 spare |
+
+Same story as Phase 4: `/work` and `/work/susila` share the Phase 1-3 framework
++ shell floor (~116 KB) and land at essentially the same weight as the
+homepage, ~1 KB over on the brotli reading. Not investigated further per
+Phase 4's conclusion — this is accumulated shared-shell weight (Nav,
+MobileNav, ThemeToggle, Footer, Button, Card, Tag, WhatsAppButton), not a
+Phase 5-specific regression. Left for the budget conversation once the plan
+is complete, per your instruction.
+
+### A real content bug found by AC6, not by inspection
+
+`content/case-studies/susila.mdx`'s body was missing the `## The problem`
+heading — the section's paragraphs followed directly after the frontmatter
+closing `---` with no heading at all, so the rendered `h2` sequence was
+`What we built, Since then, Outcome` instead of the four sections Section
+5.11 specifies. This is exactly the class of error the acceptance criteria
+exist to catch: it would have shipped invisibly, since the page still
+"looked fine" — three sections instead of four reads as complete unless you
+know to count. Fixed by adding the missing `## The problem` heading; verified
+by rebuilding and re-checking the h2 order.
+
+### Acceptance criteria verified
+
+1. `/work` and `/work/susila` static/SSG; `generateStaticParams` produced
+   exactly one slug (landora, levelup-saloon correctly excluded as drafts).
+2. `/work/landora` returns real HTTP 404 while `draft: true`; flipping to
+   `draft: false` and rebuilding makes it prerender — tested both directions,
+   reverted.
+3. Row alternation confirmed in compiled classes: rows 1 & 3
+   `desk:flex-row`, row 2 `desk:flex-row-reverse`.
+4. Two draft rows render "Case study coming soon" as plain text, never
+   wrapped in `<a>`.
+5. Full-bleed decision band confirmed: `w-screen -translate-x-1/2` breaks out
+   of the 760px reading column.
+6. Exactly one `<h1>` ("Susila"); h2 order `The problem, What we built,
+   Since then, Outcome` — after the fix above.
+7. Editing susila.mdx's body text changed the rendered page with zero `.tsx`
+   edits — tested and reverted.
+8. `/work/susila` PrevNext: prev = LevelUp Saloon, next = Landora Tours,
+   matching `getAdjacentProjects`'s wrap-around order.
+9. `grep -rn "use client" components/work app/work` → empty.
+10. Device-frame images carry `dark:border dark:border-line` — confirmed in
+    served HTML (16 occurrences on the case-study page across device frames,
+    project cards and work-index media).

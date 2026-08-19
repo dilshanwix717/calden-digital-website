@@ -80,9 +80,17 @@ export function readCaseStudy(slug: string): CaseStudy | null {
  * Component (Phase 5's case-study page) — never from scripts/validate-
  * content.ts. See the file-level comment for why.
  */
+/**
+ * `components` is typed with `any` deliberately: MDX components receive
+ * whatever props the .mdx source passes at each call site (see
+ * DecisionBand's eyebrow/statement/children), so a single static prop
+ * shape can't describe every entry in this map, and this is also the type
+ * next-mdx-remote's own MDXRemoteProps["components"] resolves to.
+ */
 export async function compileCaseStudyBody(
   body: string,
-  components?: Record<string, React.ComponentType>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  components?: Record<string, React.ComponentType<any>>,
 ): Promise<React.ReactElement> {
   const { compileMDX } = await import("next-mdx-remote/rsc");
   const { content } = await compileMDX({
