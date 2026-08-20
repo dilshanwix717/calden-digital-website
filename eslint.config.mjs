@@ -11,10 +11,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // The Claude Design handoff is reference material, not source. It is
-    // React-18-in-the-browser prototype code and is never built or shipped.
-    // Read it, do not lint it.
-    "design_handoff_calden_site/**",
   ]),
 ]);
 

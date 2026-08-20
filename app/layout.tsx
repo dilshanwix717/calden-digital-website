@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import { ThemeScript } from "@/components/layout/ThemeScript";
 import { Footer } from "@/components/layout/Footer";
 import { Plausible } from "@/components/analytics/Plausible";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -70,11 +69,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // suppressHydrationWarning: ThemeScript mutates <html> before React hydrates.
-    <html lang="en" className={outfit.variable} suppressHydrationWarning>
-      <head>
-        <ThemeScript />
-      </head>
+    <html lang="en" className={outfit.variable}>
       <body className="flex min-h-screen flex-col">
         <a href="#main" className="skip-link">
           Skip to content

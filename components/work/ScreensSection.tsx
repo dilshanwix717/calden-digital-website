@@ -20,7 +20,7 @@ export function ScreensSection({ screens }: { screens: CaseStudyFrontmatter["scr
           <figure key={screen.image.src} className="w-full desk:w-auto">
             {screen.frame === "browser" ? (
               <BrowserFrame url={screen.url}>
-                <div className="relative aspect-[16/10.5] w-full dark:border dark:border-line desk:w-[640px]">
+                <div className="relative aspect-[16/10.5] w-full desk:w-[640px]">
                   <Image
                     src={screen.image.src}
                     alt={screen.image.alt}
@@ -32,7 +32,7 @@ export function ScreensSection({ screens }: { screens: CaseStudyFrontmatter["scr
               </BrowserFrame>
             ) : (
               <PhoneFrame>
-                <div className="relative aspect-[402/780] w-[240px] dark:border dark:border-line">
+                <div className="relative aspect-[402/780] w-[240px]">
                   <Image
                     src={screen.image.src}
                     alt={screen.image.alt}

@@ -1,21 +1,17 @@
-import { cn } from "@/lib/cn";
-
 /**
- * Calden Digital horizontal lockup.
- *
- * Inlined rather than served as a file because it sits above the fold in the
- * nav — an <img> would be a second request and a visible pop-in — and because
- * an <img> cannot be recoloured for the dark footer without shipping a second
- * asset. Source: public/logo/calden-digital-horizontal-teal-golddesc.svg,
+ * Calden Digital horizontal lockup — navbar only. The footer uses the real
+ * SVG file directly (public/logo/calden-digital-stacked-teal-golddesc.svg,
+ * via next/image); this one stays inlined because it sits above the fold in
+ * the nav, where an <img> would be a second request and a visible pop-in.
+ * Source: public/logo/calden-digital-horizontal-teal-golddesc.svg,
  * coordinates rounded to 2dp.
  *
  * Brand rule: never recolour, stretch or rotate it, and keep clear space of at
  * least the height of the "C" on all sides.
  *
  * ─────────────────────────────────────────────────────────────────────────
- *  TO CHANGE THE LOGO SIZE, edit the `height` props at the call sites:
- *    • Navbar  -> components/layout/Nav.tsx   (LOGO SIZE marker)
- *    • Footer  -> components/layout/Footer.tsx
+ *  TO CHANGE THE LOGO SIZE, edit the `height` props at the call site:
+ *    • Navbar -> components/layout/Nav.tsx   (LOGO SIZE marker)
  *  Width is derived from height automatically, so the aspect ratio is safe.
  * ─────────────────────────────────────────────────────────────────────────
  */
@@ -25,14 +21,6 @@ const ASPECT = 307 / 146;
 type LogoProps = {
   /** Rendered height in px. Width follows the 307:146 aspect ratio. */
   height?: number;
-  /**
-   * "brand"  — teal mark + teal wordmark + gold descriptor (light surfaces).
-   * "onDark" — light mark + light wordmark + teal descriptor, for the footer
-   *            band. The brand teal (#0F5C5C) on the dark band (#12312F) is
-   *            1.4:1 — effectively invisible — which is why an on-dark tone
-   *            exists at all rather than reusing one lockup everywhere.
-   */
-  tone?: "brand" | "onDark";
   /** Accessible name. Pass "" to mark it decorative when adjacent text names it. */
   title?: string;
   className?: string;
@@ -40,7 +28,6 @@ type LogoProps = {
 
 export function Logo({
   height = 30,
-  tone = "brand",
   title = "Calden Digital",
   className,
 }: LogoProps) {
@@ -50,7 +37,7 @@ export function Logo({
       viewBox="0 0 307 146"
       height={height}
       width={ASPECT * height}
-      className={cn(tone === "onDark" && "logo-on-dark", className)}
+      className={className}
       role={decorative ? undefined : "img"}
       aria-hidden={decorative ? true : undefined}
       aria-label={decorative ? undefined : title}

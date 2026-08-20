@@ -44,3 +44,7 @@ __pw_*.mjs*
 
 # Lighthouse CI local run output
 .lighthouseci
+
+# Video masters. Source clips the hero encodes are derived from — kept locally
+# for re-encoding, never committed and never served (they are outside public/).
+/assets

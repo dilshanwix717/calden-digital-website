@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getSite, getNavigation } from "@/lib/content";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { Logo } from "@/components/ui/Logo";
 import { MapPin } from "@/components/icons/MapPin";
 import { Mail } from "@/components/icons/Mail";
 import { ChatGlyph } from "@/components/icons/ChatGlyph";
@@ -10,15 +9,16 @@ import { SOCIAL_ICONS } from "@/components/icons/social";
 /**
  * Footer.
  *
- * No gold anywhere. The design system permits gold as text on a dark band
- * (6.63:1, so it passes contrast), but it read harshly here against the deep
- * green — the accent is the on-band teal (--brand-on-band, #3FAEA5, 5.19:1)
- * instead, which is on-brand without the clash.
+ * Dark band (bg-band), not a light surface: the section immediately above the
+ * footer is bg-sunken on the homepage and bg-page on /contact — both light —
+ * so a light footer sat flush against them with no visible seam. The band is
+ * what actually separates "page content" from "footer" on every route.
  *
- * The lockup uses tone="onDark": the brand teal is ~1.4:1 on this band and
- * would be effectively invisible, so the mark and wordmark swap to the band's
- * light text colour. See components/ui/Logo.tsx and the .logo-on-dark rule in
- * app/globals.css.
+ * The lockup is a white circle holding the mark
+ * (public/logo/calden-mark.svg, true colours — legible because the circle,
+ * not the band, is what's behind it) plus the company name set as real text
+ * in `--text-on-band`, not the wordmark's own letterforms. Mark left, name
+ * right, per the brief.
  *
  * Column headings are h2, not h4 as the design system's own footer had them.
  * Every page here has exactly one h1 and the footer is always the last
@@ -27,8 +27,10 @@ import { SOCIAL_ICONS } from "@/components/icons/social";
  * cross-page heading-order check in scripts/check-a11y-static.mjs.
  */
 
-/** Change the footer lockup size here. Width follows the aspect ratio. */
-const LOGO_HEIGHT = 54;
+/** Change the footer mark-badge size here. Mark width follows its own aspect ratio. */
+const BADGE_SIZE = 60;
+const MARK_HEIGHT = 34;
+const MARK_ASPECT = 145 / 161;
 
 export function Footer() {
   const { company, contact, whatsapp, socials, copyright } = getSite();
@@ -44,8 +46,51 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-12 desk:grid-cols-[1.5fr_1fr_1.2fr] desk:gap-16">
           {/* Brand + about + socials */}
           <div>
-            <Link href="/" className="inline-flex" aria-label={`${company.name} home`}>
-              <Logo height={LOGO_HEIGHT} tone="onDark" title="" />
+            <Link
+              href="/"
+              className="inline-flex items-center gap-4"
+              aria-label={`${company.name} home`}
+            >
+              <span
+                className="flex flex-none items-center justify-center rounded-full bg-white"
+                style={{ height: BADGE_SIZE, width: BADGE_SIZE }}
+              >
+                <svg
+                  viewBox="0 0 145 161"
+                  height={MARK_HEIGHT}
+                  width={MARK_HEIGHT * MARK_ASPECT}
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M124.43 50.51 L72.47 20.51 L20.51 50.51 L20.51 110.51 L72.47 140.51 L124.43 110.51"
+                    fill="none"
+                    stroke="#0F5C5C"
+                    strokeWidth="13.02"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M108.84 59.51 L72.47 38.51 L36.10 59.51 L36.10 101.51 L72.47 122.51 L108.84 101.51"
+                    fill="none"
+                    stroke="#0F5C5C"
+                    strokeWidth="10.98"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M92.37 69.02 L72.47 57.53 L52.57 69.02 L52.57 92.00 L72.47 103.49 L92.37 92.00"
+                    fill="none"
+                    stroke="#D4AF37"
+                    strokeWidth="9.00"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span className="text-[26px] font-semibold tracking-[-0.01em] text-on-band">
+                {company.name}
+              </span>
             </Link>
             <p className="mt-5 max-w-[42ch] text-[15px] leading-[1.7] text-on-band-muted">
               {company.description}
@@ -112,7 +157,7 @@ export function Footer() {
                   href={whatsappUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[15px] text-on-band transition-colors duration-200 hover:text-[var(--brand-on-band)]"
+                  className="text-[15px] text-on-band transition-colors duration-200 hover:text-brand-on-band"
                 >
                   {whatsapp.label}
                 </a>
@@ -121,7 +166,7 @@ export function Footer() {
               <ContactRow icon={<Mail size={17} />} label="Email">
                 <a
                   href={`mailto:${contact.email}`}
-                  className="text-[15px] text-on-band transition-colors duration-200 hover:text-[var(--brand-on-band)]"
+                  className="text-[15px] text-on-band transition-colors duration-200 hover:text-brand-on-band"
                 >
                   {contact.email}
                 </a>
@@ -170,7 +215,7 @@ function ContactRow({
     <li className="flex items-start gap-3.5">
       <span
         aria-hidden="true"
-        className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--text-on-band)_9%,transparent)] text-[var(--brand-on-band)]"
+        className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--text-on-band)_9%,transparent)] text-brand-on-band"
       >
         {icon}
       </span>

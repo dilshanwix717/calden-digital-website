@@ -48,25 +48,25 @@
       "href": "/contact"
     },
     "video": {
-      "enabled": false,
+      "enabled": true,
       "poster": {
         "src": "/video/hero-poster.jpg",
         "alt": "",
-        "width": 1920,
-        "height": 1080
+        "width": 720,
+        "height": 480
       },
       "sources": {
         "mobile": {
-          "src": "/video/hero-720.mp4",
+          "src": "/video/hero-mobile.mp4",
           "type": "video/mp4",
           "maxWidth": 819
         },
         "desktop": {
-          "src": "/video/hero-1080.mp4",
+          "src": "/video/hero-desktop.mp4",
           "type": "video/mp4"
         }
       },
-      "scrimOpacity": 0.55
+      "scrimOpacity": 0.5
     }
   },
   "homepage": {

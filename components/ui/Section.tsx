@@ -7,10 +7,7 @@ type Width = "site" | "band" | "read";
 const SURFACE_CLASS: Record<Surface, string> = {
   page: "bg-page text-ink",
   sunken: "bg-sunken text-ink",
-  // Band inverts direction between themes (darker in light, lighter in dark —
-  // see globals.css and BUILD-PLAN §1.6). The hairlines only render in dark
-  // mode, where they reinforce a step that is otherwise a subtle upward move.
-  band: "bg-band text-on-band dark:border-y dark:border-line",
+  band: "bg-band text-on-band",
   card: "bg-surface text-ink",
 };
 

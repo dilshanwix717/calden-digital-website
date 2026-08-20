@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-/* Dark mode is class-based, not media-based: an inline script in <head> sets the
-   class before first paint, so there is never a flash of the wrong theme. */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ============================================================================
    Design tokens — Calden Digital
    Source of truth: design_handoff_calden_site/_ds/.../tokens/*.css
@@ -87,64 +83,10 @@
   }
 }
 
-/* ---------- Dark theme — DEACTIVATED, kept intact ----------
-   Nothing here is dead code by accident: dark mode is switched off via
-   DARK_MODE_ENABLED in lib/theme.ts, which stops ThemeScript from ever
-   adding the `dark` class. These tokens and every `dark:` variant in the
-   components stay exactly as built, so flipping that one flag back to true
-   restores the whole thing. Do not delete this block to "clean up". */
-.dark {
-  --surface-page: #0D1817;
-  --surface-card: #14211F;
-  --surface-sunken: #0A1312;
-  /* The band INVERTS: in light it is darker than the page, in dark it is lighter
-     than both page and card. Keeping ink here would give 1.30:1 and disappear. */
-  --surface-band: #1F3733;
-
-  --border: #23332F;
-  --border-control: #586F69;
-
-  --text-primary: #E9EFED;
-  --text-secondary: #A3B3AF;
-  --text-subtle: #7A8A86;
-
-  --brand-teal: #2E9B93;
-  --brand-teal-hover: #3FAEA5;
-  --brand-teal-active: #4CBDB3;
-  /* The dark-mode teal is LIGHT. Light text on it is 2.90:1 and fails; dark ink
-     is 5.37:1 and passes. A dark-mode primary button has dark text. */
-  --text-on-brand: #0D1817;
-
-  --accent-gold: #E0BE50;
-  --focus-ring: #2E9B93;
-  --danger: #E08D79;
-  --success: #5FBF95;
-
-  --logo-stroke: #2E9B93;
-  --logo-accent: #E0BE50;
-  --logo-word: #E9EFED;
-
-  /* --brand-on-band, --text-on-band and --text-on-band-muted are intentionally
-     NOT redefined: they are identical in both themes, so band components never
-     branch on theme. Only the band fill changes. */
-}
-
-/* On-dark logo tone — see components/ui/Logo.tsx's `tone="onDark"`.
-   The brand teal (#0F5C5C) sits at ~1.4:1 on the dark band (#12312F), i.e.
-   effectively invisible, so the footer lockup swaps the mark and wordmark to
-   the band's light text colour and the descriptor to the on-band teal.
-   Gold is deliberately not used here — it reads harshly against the band. */
-.logo-on-dark {
-  --logo-stroke: var(--text-on-band);
-  --logo-word: var(--text-on-band);
-  --logo-accent: var(--brand-on-band);
-}
-
 /* ============================================================================
    Tailwind theme mapping
-   `inline` is load-bearing: it makes utilities emit var(--surface-page) rather
-   than resolving to the literal at build time, which is what lets .dark cascade.
-   Without it dark mode silently does nothing.
+   `inline` makes utilities emit var(--surface-page) rather than resolving to
+   the literal at build time.
    ========================================================================= */
 @theme inline {
   --color-page: var(--surface-page);
@@ -189,7 +131,6 @@
 
 @layer base {
   html { color-scheme: light; }
-  html.dark { color-scheme: dark; }
 
   body {
     background: var(--surface-page);

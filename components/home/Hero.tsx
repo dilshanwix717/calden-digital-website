@@ -1,4 +1,5 @@
 import { getSite } from "@/lib/content";
+import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { HeroVideo } from "@/components/home/HeroVideo";
@@ -20,14 +21,21 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-0 desk:min-h-[min(84vh,720px)]">
-      <HexPattern />
+      {/* The hexagons read as texture on the light page but as scratches over
+          video, and they compete with the clip's own motion. Over video the
+          clip IS the texture, so they come out entirely. */}
+      {!videoEnabled && <HexPattern />}
 
       {videoEnabled && (
         <>
           <HeroVideo video={hero.video} />
+          {/* --surface-band, not bg-page: the scrim has to darken toward the
+              same colour the on-band text tokens were contrast-checked
+              against. A light scrim over a graded clip lands in the muddy
+              middle where neither ink nor on-band text passes. */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 z-[1] bg-page"
+            className="absolute inset-0 z-[1] bg-band"
             style={{ opacity: hero.video.scrimOpacity }}
           />
         </>
@@ -35,10 +43,25 @@ export function Hero() {
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 py-14 text-center desk:px-16 desk:py-20">
         <div className="max-w-full desk:max-w-[760px]">
-          <h1 className="max-w-full text-[30px] font-semibold leading-[1.12] tracking-[-0.022em] text-ink desk:max-w-[17ch] desk:text-[58px] desk:leading-[1.05]">
+          <h1
+            className={cn(
+              "max-w-full text-[30px] font-semibold leading-[1.12] tracking-[-0.022em] desk:max-w-[17ch] desk:text-[58px] desk:leading-[1.05]",
+              videoEnabled ? "text-on-band" : "text-ink",
+            )}
+          >
             {hero.headline}
           </h1>
-          <p className="mx-auto mt-4 max-w-full text-base leading-[1.6] text-muted desk:mt-[22px] desk:max-w-[58ch] desk:text-xl">
+          {/* Over video this is --text-on-band, NOT --text-on-band-muted.
+              The muted token tops out at 3.68:1 over the graded clip at every
+              scrim opacity that still shows water — it cannot be made to
+              pass, so the subhead goes full-strength rather than the scrim
+              going opaque. */}
+          <p
+            className={cn(
+              "mx-auto mt-4 max-w-full text-base leading-[1.6] desk:mt-[22px] desk:max-w-[58ch] desk:text-xl",
+              videoEnabled ? "text-on-band" : "text-muted",
+            )}
+          >
             {hero.subhead}
           </p>
           <div className="mt-[22px] flex w-full flex-col items-stretch gap-2.5 desk:mt-8 desk:w-auto desk:flex-row desk:items-center desk:justify-center desk:gap-3">
@@ -46,7 +69,7 @@ export function Hero() {
               {hero.primaryCta.label}
               <span aria-hidden="true">→</span>
             </Button>
-            <WhatsAppButton variant="secondary" size="lg" fullWidth={false} className="w-full box-border desk:w-auto" />
+            <WhatsAppButton variant={videoEnabled ? "secondaryOnBand" : "secondary"} size="lg" fullWidth={false} className="w-full box-border desk:w-auto" />
           </div>
         </div>
       </div>

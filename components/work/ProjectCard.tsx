@@ -7,10 +7,6 @@ import type { Project } from "@/lib/schemas";
  * border and turns the title teal via the group-hover pattern rather than
  * two separate hover handlers. Fixed 4:3 media aspect ratio means the image
  * never causes layout shift (CLS 0) regardless of whether it has loaded.
- *
- * dark:border on the media wrapper — screenshots and light-background
- * images need a border in dark mode so they don't glare against the page
- * (brief requirement, BUILD-PLAN Phase 4).
  */
 export function ProjectCard({ project }: { project: Project }) {
   return (
@@ -18,7 +14,7 @@ export function ProjectCard({ project }: { project: Project }) {
       href={`/work/${project.slug}`}
       className="group flex flex-col overflow-hidden rounded-md border border-line bg-surface transition-colors duration-200 hover:border-line-control"
     >
-      <div className="relative aspect-[4/3] border-b border-line bg-sunken dark:border dark:border-line">
+      <div className="relative aspect-[4/3] border-b border-line bg-sunken">
         <Image
           src={project.cover.src}
           alt={project.cover.alt}

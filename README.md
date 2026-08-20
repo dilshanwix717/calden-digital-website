@@ -26,8 +26,7 @@ step and is outside `typescript-eslint`'s supported range
 this toolchain; it is also the deliberate "bridge" release that removes the
 APIs TS 7 dropped, so code that's clean under 6.0.3 should upgrade cleanly
 once the ecosystem catches up. Do not change this pin to `latest` — that
-resolves to 7.x and will break the build. See `docs/BUILD-PLAN.md` §4.1 for
-the full investigation.
+resolves to 7.x and will break the build.
 
 ## Setup
 
@@ -96,27 +95,13 @@ practical ceiling before the lockup starts crowding the bar.
 The lockup is inlined as SVG (`components/ui/Logo.tsx`) rather than served as
 a file — it's above the fold, so an `<img>` would be a second request and a
 visible pop-in. It has two tones: `brand` (teal mark and wordmark, gold
-descriptor) for light surfaces, and `onDark` for the footer band, where the
-brand teal would sit at ~1.4:1 and be effectively invisible.
+descriptor) for light surfaces, and `onBand` for the dark footer band, where
+the brand teal would sit at ~1.4:1 and be effectively invisible.
 
-**Dark mode is built but deactivated.** Nothing was deleted — the `.dark`
-token block in `app/globals.css`, `ThemeScript`, `ThemeToggle` and every
-`dark:` variant across the components are all intact. To bring it back:
-
-1. Set `DARK_MODE_ENABLED = true` in `lib/theme.ts` (re-enables the no-flash
-   theme script).
-2. Uncomment the two lines marked `DARK MODE (1/2)` and `DARK MODE (2/2)` in
-   `components/layout/Nav.tsx` (puts the toggle back in the navbar's
-   right-hand corner).
-
-The toggle is commented out rather than conditionally rendered because
-`{DARK_MODE_ENABLED && <ThemeToggle />}` still bundles the component for
-every visitor — measured at ~1 KB brotli per route of dead weight while the
-flag is off.
-
-It's off because a studio site doesn't need a theme switcher, and the dark
-palette needed more design attention than it was getting — the footer band in
-particular.
+**There is no dark mode.** The site is light-only — a professional studio
+site doesn't need a theme switcher. The footer keeps its own dark green band
+(`bg-band`, unrelated to any site-wide theme), which is why the logo's
+`onBand` tone still exists.
 
 ## How to write a case study
 

@@ -24,7 +24,7 @@ export function ProjectRow({
   const media = (
     <div className="flex-1">
       {isDraft ? (
-        <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken dark:border dark:border-line">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken">
           <Image
             src={project.cover.src}
             alt={project.cover.alt}
@@ -35,7 +35,7 @@ export function ProjectRow({
         </div>
       ) : (
         <Link href={href} className="block">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken dark:border dark:border-line">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken">
             <Image
               src={project.cover.src}
               alt={project.cover.alt}

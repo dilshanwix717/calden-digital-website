@@ -63,8 +63,8 @@ See `README.md`'s "Known limitations" for the full detail behind each item.
 - [ ] Final manual pass on the deployed production URL: keyboard traversal
       of all eight pages at 390px and 1440px, `prefers-reduced-motion:
       reduce`, 400% zoom at 390px, axe DevTools on all eight routes. Light
-      theme only — dark mode is deactivated (`DARK_MODE_ENABLED` in
-      lib/theme.ts), so there is no second theme to check.
+      theme only — there is no dark mode, so there is no second theme to
+      check.
 
 ## Budget document integrity
 

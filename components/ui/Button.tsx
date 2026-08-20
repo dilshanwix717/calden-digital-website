@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "text";
+type Variant = "primary" | "secondary" | "secondaryOnBand" | "text";
 type Size = "sm" | "md" | "lg";
 
 const SIZE_CLASS: Record<Size, string> = {
@@ -19,6 +19,11 @@ const VARIANT_CLASS: Record<Variant, string> = {
     "bg-brand text-on-brand border border-brand hover:bg-brand-hover hover:border-brand-hover active:bg-brand-active active:border-brand-active",
   secondary:
     "bg-transparent text-brand border border-brand hover:bg-[color-mix(in_srgb,var(--brand-teal)_7%,transparent)] active:bg-[color-mix(in_srgb,var(--brand-teal)_13%,transparent)]",
+  // Same shape as secondary, but --brand-teal is 2.33:1 over the graded
+  // hero video and fails AA there. Outline and label switch to --text-on-band;
+  // the wash inverts to white because a teal wash vanishes on a dark ground.
+  secondaryOnBand:
+    "bg-transparent text-on-band border border-[color-mix(in_srgb,var(--text-on-band)_55%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-on-band)_10%,transparent)] hover:border-on-band active:bg-[color-mix(in_srgb,var(--text-on-band)_18%,transparent)]",
   text: "bg-transparent text-brand border-transparent px-1.5 rounded-xs hover:underline hover:underline-offset-[3px]",
 };
 
