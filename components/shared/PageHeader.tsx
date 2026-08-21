@@ -15,8 +15,10 @@ export function PageHeader({
   title: string;
   lead?: string | null;
 }) {
+  // reveal off: this is always the first thing on the page and always in
+  // the initial viewport, so animating it has nothing to reveal.
   return (
-    <Section surface="page" className="pb-2 pt-11 sm:pb-4 sm:pt-[72px]">
+    <Section surface="page" reveal={false} className="pb-2 pt-11 sm:pb-4 sm:pt-[72px]">
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <h1
         className={`text-[36px] font-semibold leading-[1.05] tracking-[-0.022em] text-ink desk:text-[58px] ${

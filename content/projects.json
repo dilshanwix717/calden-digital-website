@@ -1,50 +1,67 @@
 [
   {
+    "slug": "landora",
+    "displayOrder": 2,
+    "featured": true,
+    "title": "Landora Tours",
+    "subtitle": "A Sri Lankan tour operator built from a blank page",
+    "cardTitle": "Landora Tours — travel site",
+    "cardSummary": "The client had packages and hotels — nothing else. We researched the market, designed it, built it and tested it: 106 pages, a clickable island map, and a planner that lets travellers build their own trip.",
+    "cardMeta": "Design and build · two weeks",
+    "summary": "Landora Tours arrived with a list of packages and the hotels they work with. Everything else — what the site should be, how it should be organised, how it should look and how it should behave — was ours. We researched the market, designed the experience, built it in Next.js and tested it: 106 pages, an interactive island map, and a step-by-step planner that lets a traveller assemble their own journey.",
+    "tags": ["Website", "Travel", "Custom planner"],
+    "role": "Research, UI/UX design, engineering and QA",
+    "timeline": "Two weeks, blank page to review",
+    "stack": ["Next.js", "Tailwind CSS", "Vercel"],
+    "liveUrl": "https://landoratours.vercel.app",
+    "cover": {
+      "src": "/images/work/landora-cover.png",
+      "alt": "The Landora Tours homepage showing an itinerary and the interactive island map",
+      "width": 2850,
+      "height": 1382
+    }
+  },
+  {
     "slug": "susila",
     "displayOrder": 1,
     "featured": true,
     "title": "Susila",
     "subtitle": "Rebuilding the streaming layer of a Sinhala film platform",
     "cardTitle": "Susila — streaming platform",
-    "cardSummary": "A film streaming platform whose video delivery wasn’t working. We rebuilt it around adaptive playback, added live streaming, and took it to launch.",
-    "cardMeta": "One developer · one month",
-    "summary": "Susila Productions had a subscription streaming platform that had already been built — and the streaming itself didn’t work properly. We were brought in to fix the part that mattered most. We rebuilt video delivery around adaptive streaming, added live broadcast, and integrated recurring subscription billing.",
-    "tags": ["Web app", "Streaming"],
-    "role": "Sole developer on the rebuild",
-    "timeline": "Roughly one month, part-time",
+    "cardSummary": "A film streaming platform that looked finished but could not take a payment, check who had paid, or stream reliably. We rebuilt delivery, billing and access control, then added live streaming.",
+    "cardMeta": "Rebuild · one month",
+    "summary": "Susila Productions had a subscription streaming platform that had already been built. The pricing page took no money, nothing on the server checked who was entitled to watch, and playback ran through a third-party embed that could not adapt to a mobile connection. We rebuilt video delivery, subscription billing and access control, restructured the front end, and later added live broadcast.",
+    "tags": ["Web app", "Streaming", "Payments"],
+    "role": "Engineering, UI/UX and QA across the rebuild",
+    "timeline": "About one month, handover to launch",
     "stack": ["React", "Node.js", "MongoDB", "HLS", "Stripe"],
-    "cover": { "src": "/images/work/susila-cover.jpg", "alt": "The Susila streaming platform playing a film in the custom HLS player", "width": 1600, "height": 1000 }
+    "cover": {
+      "src": "/images/work/susila-cover.png",
+      "alt": "The Susila streaming platform playing a film in the custom HLS player",
+      "width": 2878,
+      "height": 1382
+    }
   },
-  {
-    "slug": "landora",
-    "displayOrder": 2,
-    "featured": true,
-    "title": "Landora Tours",
-    "subtitle": "Full content site for a Sri Lankan tour operator",
-    "cardTitle": "Landora Tours — travel site",
-    "cardSummary": "Seventeen itineraries, thirty-plus experiences, an interactive island map, and multi-language support. Designed and built in two weeks.",
-    "cardMeta": "Design and build · two weeks",
-    "summary": "Landora Tours design private journeys across Sri Lanka for travellers from Europe, Australia and Asia. Almost all of their enquiries begin with a stranger abroad deciding whether this company looks trustworthy. We designed and built the entire site — seventeen itineraries, thirty-plus experiences, destination guides, an interactive island map, and a journal — with enquiry routed straight to WhatsApp.",
-    "tags": ["Website", "Multi-language"],
-    "role": "Design and build from scratch",
-    "timeline": "Two weeks",
-    "stack": ["Next.js", "Tailwind CSS", "Vercel"],
-    "cover": { "src": "/images/work/landora-cover.jpg", "alt": "The Landora Tours homepage showing an itinerary and the interactive island map", "width": 1600, "height": 1000 }
-  },
+
   {
     "slug": "levelup-saloon",
     "displayOrder": 3,
     "featured": true,
     "title": "LevelUp Saloon",
-    "subtitle": "Inherited a saloon management platform mid-flight and shipped it on deadline",
+    "subtitle": "Rebuilding an AI-generated salon platform that only looked finished",
     "cardTitle": "LevelUp Saloon",
-    "cardSummary": "A booking and management system days from its deadline with unresolved defects. We audited the system end to end, found what was breaking it, and delivered on schedule.",
-    "cardMeta": "Audit and delivery · shipped on time",
-    "summary": "A saloon management SaaS was days from delivery with defects the original developers hadn’t been able to resolve. We came in cold, audited the entire system end to end, found three real bugs — including one that silently broke appointment editing for every user — fixed them, and delivered on the original date.",
-    "tags": ["Rescue", "Web app"],
-    "role": "Audit and delivery",
-    "timeline": "3–5 days, against a fixed deadline",
+    "cardSummary": "An AI-built salon app that ran fine and silently discarded every appointment edit. We rebuilt it underneath in five phases, audited all four flows end to end, and changed nothing the staff could see.",
+    "cardMeta": "Rebuild and audit · shipped on time",
+    "summary": "LevelUp Saloon had a working salon management app — built with AI assistance, running, demoable. It also had a core flow that failed silently: every edit to a scheduled appointment was rejected by the database and rolled back, while the interface reported success. We rebuilt the system underneath across five phases without touching a single line of their design, then audited all four flows end to end and fixed what that turned up.",
+    "tags": ["Project rescue", "Web app", "Vibe-coded fix"],
+    "role": "Rebuild and end-to-end audit — engineering and QA",
+    "timeline": "Five phases, then a full audit, against a fixed date",
     "stack": ["Next.js", "TypeScript", "Supabase", "Zod"],
-    "cover": { "src": "/images/work/levelup-saloon-cover.jpg", "alt": "The LevelUp Saloon dashboard showing the appointment calendar", "width": 1600, "height": 1000 }
+    "cover": {
+      "src": "/images/work/levelup-saloon-cover.png",
+      "alt": "The LevelUp Saloon dashboard showing the appointment calendar",
+      "width": 1800,
+      "height": 1382
+    }
   }
 ]

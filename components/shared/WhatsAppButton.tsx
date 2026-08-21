@@ -11,7 +11,7 @@ import { cn } from "@/lib/cn";
  * wrapper around this component instead of a rewrite. See BUILD-PLAN §3.
  */
 type WhatsAppButtonProps = {
-  variant?: "primary" | "secondary" | "secondaryOnBand" | "text";
+  variant?: "primary" | "secondary" | "text";
   size?: "sm" | "md" | "lg";
   /** Overrides site.json's whatsapp.defaultMessage. */
   message?: string;

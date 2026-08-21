@@ -7,6 +7,15 @@ import { BandSection } from "@/components/shared/BandSection";
  * carrying their own bg-band background — otherwise the rule would cross
  * in front of them (a listed common pitfall).
  *
+ * On desktop the connector is drawn per step rather than as one rule across
+ * the row. A single rule has to know where the first and last rings are, and
+ * the previous one guessed at left-[10%] right-[10%]: the rings sit at the
+ * LEFT edge of their grid column (items-start), not centred in it, so the
+ * line began past ring 1 and overshot ring 5. Each step now draws its own
+ * segment from its ring's right edge (left-12, the ring being h-12) across
+ * the gap to the next column (-right-6, matching gap-6). That is exact at
+ * any width, and the last step simply has no segment.
+ *
  * Ring border and numeral use --brand-on-band, NOT the design system's
  * --teal-on-dark (2.78:1, fails AA on the band — see §1.6b).
  */
@@ -34,10 +43,15 @@ export function HowWeWork() {
 
       {/* Desktop: horizontal stepper */}
       <div className="relative mt-14 hidden desk:block">
-        <div className="absolute left-[10%] right-[10%] top-6 h-0.5 bg-line" aria-hidden="true" />
         <div className="relative grid grid-cols-5 gap-6">
-          {steps.map((step) => (
-            <div key={step.step} className="flex flex-col items-start">
+          {steps.map((step, i) => (
+            <div key={step.step} className="relative flex flex-col items-start">
+              {i < steps.length - 1 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute left-12 -right-6 top-6 h-0.5 -translate-y-1/2 bg-line"
+                />
+              )}
               <StepRing>{step.step}</StepRing>
               <h3 className="mt-[22px] text-[19px] font-semibold tracking-[-0.01em] text-on-band">
                 {step.title}

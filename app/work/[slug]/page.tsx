@@ -80,7 +80,7 @@ export default async function CaseStudyPage({
       <JsonLd data={jsonLd} />
       <Header currentPath={`/work/${slug}`} />
       <CaseStudyHeader title={frontmatter.title} subtitle={frontmatter.subtitle} />
-      <FactsStrip facts={frontmatter.facts} />
+      <FactsStrip facts={frontmatter.facts} liveUrl={project?.liveUrl} />
 
       <Section as="article" surface="page" className="overflow-x-hidden pt-12 desk:pt-20" containerClassName="max-w-read">
         <p
@@ -93,7 +93,7 @@ export default async function CaseStudyPage({
       </Section>
 
       <ScreensSection screens={frontmatter.screens} />
-      <QuoteBand quote={frontmatter.quote} />
+      {frontmatter.quote && <QuoteBand quote={frontmatter.quote} />}
       <PrevNext prev={prev} next={next} />
       <ContactCTA />
     </>

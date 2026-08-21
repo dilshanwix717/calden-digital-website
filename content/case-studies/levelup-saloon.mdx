@@ -1,24 +1,103 @@
 ---
 slug: "levelup-saloon"
 title: "LevelUp Saloon"
-subtitle: "Inherited a saloon management platform mid-flight and shipped it on deadline"
-summary: "A saloon management SaaS was days from delivery with defects the original developers hadn’t been able to resolve. We came in cold, audited the entire system end to end, found three real bugs — including one that silently broke appointment editing for every user — fixed them, and delivered on the original date."
+subtitle: "Rebuilding an AI-generated salon platform that only looked finished"
+summary: "LevelUp Saloon had a working salon management app — built with AI assistance, running, demoable. It also had a core flow that failed silently: every edit to a scheduled appointment was rejected by the database and rolled back, while the interface reported success. We rebuilt the system underneath across five phases without touching a single line of their design, then audited all four flows end to end and fixed what that turned up."
 facts:
-  role: "Audit and delivery"
-  timeline: "3–5 days, against a fixed deadline"
-  stack: "Next.js · TypeScript · Supabase · Zod"
+  role: "Rebuild and end-to-end audit — engineering and QA. No UI or design changes: the client's interface was kept exactly as it was."
+  timeline: "Five rebuild phases, then a full end-to-end audit, against a fixed delivery date."
+  stack: "Next.js · TypeScript · Supabase (Postgres, RPC, row-level migrations) · Zod · CSS Modules"
 decision:
-  eyebrow: null
-  statement: null
-screens: []
-quote:
-  text: null
-  attribution: "LevelUp Saloon"
+  eyebrow: "A decision worth explaining"
+  statement: "Rebuild everything underneath. Change nothing they can see."
+screens:
+  - frame: "none"
+    image:
+      src: "/images/work/levelup-newvisit1.png"
+      alt: "The New Visit screen on a phone, with client details, service tags and a Save Visit button"
+      width: 764
+      height: 1558
+    caption: "New visit — the flow staff run dozens of times a day"
+  - frame: "none"
+    image:
+      src: "/images/work/levelup-dashboard1.png"
+      alt: "The LevelUp Saloon dashboard on a phone"
+      width: 764
+      height: 1558
+    caption: "Dashboard"
+  - frame: "none"
+    image:
+      src: "/images/work/levelup-customers1.png"
+      alt: "The customers list on a phone"
+      width: 764
+      height: 1558
+    caption: "Customers"
+quote: null
 anonymised: false
-draft: true
+draft: false
 publishedAt: "2026-08-19"
-updatedAt: "2026-08-19"
+updatedAt: "2026-08-21"
 ogImage: null
 ---
 
-A saloon management SaaS was days from delivery with defects the original developers hadn't been able to resolve. We came in cold, audited the entire system end to end, found three real bugs — including one that silently broke appointment editing for every user — fixed them, and delivered on the original date.
+## The most dangerous kind of broken
+
+LevelUp Saloon came to us with an app that worked. Staff could open it, book a client, add services, take a payment. It had been built quickly with AI assistance — the kind of build that gets you something running in days — and by every visible measure it was running.
+
+Then you edited an appointment.
+
+Change the time, the stylist, the services or the notes on a booking, press save, and the interface confirmed it. Nothing was saved. The database had rejected the write and rolled the whole transaction back, and no one was told.
+
+That is the most expensive kind of defect a business can have, because it does not look like a defect. It looks like staff who forget to save.
+
+## Why it happened
+
+The transaction behind saving an appointment edit wrote the visit's status straight into the audit log's <Mono>action</Mono> column. That column is constrained to six values — <Mono>created</Mono>, <Mono>corrected</Mono>, <Mono>completed</Mono>, <Mono>cancelled</Mono>, <Mono>no_show</Mono>, <Mono>deleted</Mono>. A normal edit sends the status <Mono>scheduled</Mono>, which is not one of them. Every one of those saves violated a check constraint and rolled back.
+
+Only two paths through that code happened to send a permitted value: checking a client out, and the separate cancel and no-show endpoints. Those worked, which is exactly why the problem survived to production. The paths anyone would test in a demo were the paths that happened to be fine.
+
+This is the signature failure of generated code, and it is worth being precise about it. Nothing here is stupid. The transaction is reasonable. The audit table is reasonable. The constraint is reasonable and correct. Each piece is locally plausible — and no one wrote the line that reconciles them, because no one was holding all three in their head at once. A generator produces components that look right individually. It does not notice that two of them disagree.
+
+## The rebuild
+
+We rebuilt the system underneath in five phases, then ran a full end-to-end consistency audit across the four core flows — visits, customers, services, appointments — tracing each one the whole way down: database schema, to stored procedures, to API route handlers, to the validation schemas, to the hooks, to the pages. Not reading the code and nodding. Following one flow at a time until both ends agreed.
+
+That pass produced three real findings.
+
+**The appointment bug above.** Fixed in a migration that logs <Mono>completed</Mono> on checkout and <Mono>corrected</Mono> for every other edit — the convention the codebase already used elsewhere — with the true status preserved inside the log's JSON payload so nothing is lost from the audit trail. Applied to the live database.
+
+**A settings drift between client and server.** Salons can configure how long staff may keep editing a visit. The server read that setting correctly. The edit page had the value hardcoded to thirty minutes in three separate places. An owner changing it in settings would have seen the server enforce the new window while staff were shown the old one — a support ticket that would have been almost impossible to diagnose from the outside. The page now reads the real setting.
+
+**A field that never existed.** The type definitions declared a required <Mono>is_deleted</Mono> property on services, and six places across the app checked it before showing anything. There has never been such a column, or such an API field. The check always passed, so it never broke anything — it was simply a fiction the codebase had been carrying, and six guards protecting against a condition that could not occur. Removed, along with all six.
+
+## What was already right
+
+An audit that only reports problems is not an audit. Most of what we traced was sound, and it matters that we say so: the customers flow was consistent from database to page; money is stored in cents and displayed in rupees with the conversion done once at the API boundary and never re-done in a page; nothing referenced the data layer that had been removed earlier; the request proxy correctly excluded API routes from login redirects; and the seed data matched the live schema.
+
+<DecisionBand>
+
+The obvious move when you inherit AI-generated code is to start over — including the interface. It is the satisfying option, and on a system with a bug this fundamental it is easy to argue for.
+
+We did not touch the design. Not one stylesheet, not one layout, not one screen.
+
+Two reasons. The interface was not what was broken — the failure was three layers below anything a user could see, and rewriting the parts that worked would not have fixed the part that did not. And the staff already knew this app. A salon runs on speed at the chair; a redesign means retraining people mid-service, in exchange for nothing they asked for.
+
+So every change we made was underneath: the database transaction, the settings plumbing, the type definitions. From the front desk, the app after the rebuild is the same app — except that editing an appointment now saves.
+
+The trade-off is that we inherited design decisions we did not make and would not always make ourselves. On a delivery with a fixed date and staff already trained, that is the cheaper mistake by a wide margin.
+
+</DecisionBand>
+
+## Built for the floor
+
+The app is designed mobile-first, because that is where it is used — on a phone, standing at a chair, between clients. The same interface is available on a desktop for owners doing end-of-day work. That was the client's decision and their design, and it is the right one for the setting.
+
+## What we left, on purpose
+
+The endpoint for marking a client as a no-show exists and works, but nothing in the interface calls it yet — appointments can be cancelled, not marked no-show. We found it, flagged it, and deliberately left it for a later pass rather than adding scope to a delivery with a fixed date.
+
+We would rather hand over a list of what is not done than quietly leave it for someone to discover.
+
+## Outcome
+
+Delivered on the original date. The migration is applied to the live database, type checking and the production build are both clean, and the three defects are fixed — including the one that had been silently discarding staff work every time an appointment changed.

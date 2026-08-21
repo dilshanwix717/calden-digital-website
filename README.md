@@ -1,6 +1,6 @@
 # Calden Digital — website
 
-Marketing site for Calden Digital, a software studio in Colombo, Sri Lanka.
+Marketing site for Calden Digital, a software studio in Matara, Sri Lanka.
 Five pages, three case studies (one published), fully static, no per-request
 server rendering.
 
@@ -136,23 +136,6 @@ site doesn't need a theme switcher. The footer keeps its own dark green band
 Two case studies currently ship as drafts (`landora`, `levelup-saloon`) with
 real facts filled in but only a one-paragraph body — write the rest whenever
 ready.
-
-## How to turn on the hero video
-
-The hero ships with `hero.video.enabled: false` in `content/site.json` — a
-static hero with an animated hexagon pattern, no video, no poster image. To
-turn it on:
-
-1. Add the two video files and a poster image under `public/video/`
-   (currently empty except a `.gitkeep`): a desktop source (≤1.5 MB) and a
-   mobile source (≤600 KB, max 720p) per `docs/calden-performance-budget.md`.
-2. Update `content/site.json`'s `hero.video` block with the real file paths
-   and dimensions.
-3. Set `hero.video.enabled: true`.
-4. Rebuild.
-
-No component changes are needed — `components/home/HeroVideo.tsx` and the
-poster/scrim logic already exist and only activate when the flag is on.
 
 ## Email
 

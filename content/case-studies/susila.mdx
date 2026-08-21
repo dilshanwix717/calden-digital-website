@@ -2,78 +2,98 @@
 slug: "susila"
 title: "Susila"
 subtitle: "Rebuilding the streaming layer of a Sinhala film platform"
-summary: "Susila Productions had a subscription streaming platform that had already been built — and the streaming itself didn’t work properly. We were brought in to fix the part that mattered most. We rebuilt video delivery around adaptive streaming, added live broadcast, and integrated recurring subscription billing."
+summary: "Susila Productions had a subscription streaming platform that had already been built. The pricing page took no money, nothing on the server checked who was entitled to watch, and playback ran through a third-party embed that could not adapt to a mobile connection. We rebuilt video delivery, subscription billing and access control, restructured the front end, and later added live broadcast."
 facts:
-  role: "Sole developer on the rebuild. Brought in after the original team, working across the web client, the Node.js API, and the React admin panel."
-  timeline: "Roughly one month, part-time."
+  role: "A Calden team across the rebuild — engineering on the web client, the Node.js API and the React admin panel, UI/UX on the subscription and catalogue screens, and QA across playback, billing and access control."
+  timeline: "About one month, from handover to launch."
   stack: "React, Vite, SCSS · Node.js REST API · MongoDB · HLS playback with Vimeo as origin · Stripe for recurring subscriptions · Firebase Cloud Messaging · deployed to AWS with GitHub-triggered CI/CD"
 decision:
   eyebrow: "A decision worth explaining"
   statement: "Keep Vimeo. Change how we use it."
 screens:
   - frame: "browser"
-    url: "susila.lk/watch"
+    url: "susila.lk/movies"
     image:
-      src: "/images/work/susila-screen-desktop.jpg"
-      alt: "The custom HLS player playing a film, desktop"
-      width: 1280
-      height: 840
-    caption: "The custom HLS player — desktop"
-  - frame: "phone"
+      src: "/images/work/susila-movies-page.png"
+      alt: "The Susila film catalogue showing latest and recommended Sinhala films"
+      width: 2844
+      height: 1376
+    caption: "The catalogue — latest and recommended films"
+  - frame: "none"
     image:
-      src: "/images/work/susila-screen-mobile.jpg"
-      alt: "The Susila browse and home screen, mobile"
-      width: 804
-      height: 1560
-    caption: "Browse — mobile"
-quote:
-  text: null
-  attribution: "Susila Productions"
+      src: "/images/work/susila-packages.png"
+      alt: "The Susila subscription plans, shown on a laptop, with monthly, three, six and twelve month tiers"
+      width: 2780
+      height: 1366
+    caption: "Subscription plans — the screen that previously took no payment"
+  - frame: "browser"
+    url: "checkout.stripe.com"
+    image:
+      src: "/images/work/susila-stripe.png"
+      alt: "The Stripe checkout for a Susila monthly subscription"
+      width: 2852
+      height: 1384
+    caption: "Stripe checkout — recurring billing wired to the plan tiers"
+quote: null
 anonymised: false
 draft: false
 publishedAt: "2026-01-15"
-updatedAt: "2026-01-15"
+updatedAt: "2026-08-21"
 ogImage: null
 ---
 
 ## The problem
 
-The platform existed. Audiences could sign up. But the video layer had been built in a way that couldn't scale or serve viewers well.
+The platform existed and looked finished. Underneath it, most of what makes a streaming business work was missing, broken, or unsafe.
 
-Each film had been uploaded to Vimeo as **separate files per quality**, and playback ran through Vimeo's own embedded player. Two consequences followed. Viewers were locked to whichever quality they landed on — no adapting when a mobile connection dropped, so the video stalled instead of stepping down. And the platform had no real control over the playback experience, because the player belonged to someone else.
+**Video delivery could not adapt.** Each film had been uploaded to Vimeo as **separate files per quality**, and playback ran through Vimeo's own embedded player. Viewers were locked to whichever quality they landed on — no stepping down when a mobile connection weakened, so the film stalled instead of softening. The platform also had no control over the playback experience, because the player belonged to someone else.
 
-For a service whose entire product is video, on an audience largely watching over mobile data in Sri Lanka, that's not a rough edge. That's the product not working.
+**The subscription could not take money.** The pricing page was there — four tiers, laid out and styled. Nothing was connected behind it. No payment provider, no billing, no record of who had paid. It was an interface for a product that could not be bought.
+
+**Nothing protected the content.** This was the serious one. No check on the server tied a viewer to what they were allowed to watch. The video was reachable for any title, by anyone, subscription or not. The paywall existed only as a screen — the films behind it were effectively public.
+
+**The admin tools fought back.** The forms used to add and edit film data were unreliable: records that would not save cleanly, edits that did not hold. The people running the catalogue could not trust the tool they ran it with.
+
+**The code could not be worked in safely.** Single pages in the front end ran to three to five thousand lines, with no separation between layout, data fetching and business logic. Every change risked breaking something unrelated, which is why the existing problems had stopped being fixable.
+
+For a service whose entire product is video, on an audience largely watching over mobile data in Sri Lanka, this was not a set of rough edges. The product did not work.
 
 ## What we built
 
-**Adaptive streaming playback.** We moved delivery onto **HLS** — pulling <Mono>.m3u8</Mono> manifests from Vimeo and playing them through a player built into the platform itself rather than a third-party embed. The playback engine is built on hls.js, which handles manifest parsing and adaptive bitrate switching; the player, its interface, and everything around it — controls, states, error handling, integration with the platform's entitlement checks — we built ourselves, working from the HLS specification and Vimeo's API documentation.
+**Access control first.** Before anything else, entitlement moved to the server. Every request for a stream is now checked against an active subscription, so what a viewer can watch is decided by the API rather than by which screen they managed to reach. Closing that door was the first commit, not the last.
 
-The result: instead of a fixed file per quality, the stream steps up and down automatically with the viewer's connection. A weak signal softens the picture for a moment rather than stopping the film.
+**Subscription billing that works.** Stripe integrated for recurring subscriptions and wired to the four existing plan tiers, with billing state feeding the same entitlement checks. The pricing screens the client already had kept their design; what changed is that they now charge.
 
-**Live streaming.** Vimeo Live integrated directly into the platform, alongside the on-demand catalogue — a capability it hadn't had before.
+**Adaptive streaming playback.** We moved delivery onto **HLS** — pulling <Mono>.m3u8</Mono> manifests from Vimeo and playing them through a player built into the platform rather than a third-party embed. The playback engine is built on hls.js, which handles manifest parsing and adaptive bitrate switching; the player, its interface, controls, states, error handling and integration with entitlement checks we built ourselves, working from the HLS specification and Vimeo's API documentation. The stream now steps up and down with the viewer's connection — a weak signal softens the picture for a moment instead of stopping the film.
 
-**Subscription billing.** Stripe integrated for recurring subscriptions, with entitlement checks tying an active subscription to what a viewer can watch.
+**Admin tools rebuilt.** The forms for adding and editing film data were reworked so records save predictably and edits hold, and so the catalogue can be run without a developer on hand.
 
-Alongside this we worked across the web client, the Node.js API, and the React admin panel used to manage the catalogue and subscribers.
+**A front end that can be changed.** The oversized pages were broken into components with clear responsibilities. This is the least visible work on the project and the reason the rest of it was possible inside a month.
+
+All of it shipped in a short, continuous stretch of work rather than over a long engagement.
+
+## Then: live streaming
+
+With the platform fixed and live, Susila came back with something new rather than something broken — a request for live broadcast alongside the on-demand catalogue. We integrated **Vimeo Live** into the platform, using the same delivery approach and the same entitlement checks already in place, so a live event is gated exactly like a film.
 
 <DecisionBand>
 
-The obvious move when video delivery is broken is to take control of it — self-host, run your own transcoding, serve from your own CDN. It's also how you turn a fixable problem into an unbounded infrastructure bill. Transcoding is compute-heavy, storage grows forever, and bandwidth is the largest recurring cost in any streaming business.
+The obvious move when video delivery is broken is to take control of it — self-host, run your own transcoding, serve from your own CDN. It is also how you turn a fixable problem into an unbounded infrastructure bill. Transcoding is compute-heavy, storage grows forever, and bandwidth is the largest recurring cost in any streaming business.
 
-The actual problem wasn't Vimeo. Vimeo was already doing the expensive work — transcoding and CDN delivery — and doing it well. The problem was that the platform was consuming it in the least useful way: one static file per quality, played through someone else's embed.
+The actual problem was never Vimeo. The client had already chosen it, was already paying for it, and the entire catalogue was **already uploaded there**. Vimeo was doing the expensive work — transcoding and CDN delivery — and doing it well and quickly, and it exposes HLS manifests directly. What was wrong was how the platform consumed it: one static file per quality, played through someone else's embed.
 
-So we kept the origin and changed the consumption. Pulling the HLS manifests and playing them in our own player kept transcoding and bandwidth costs predictable, while moving playback control back inside the product — adaptive quality, and a player that behaves the way the platform needs it to.
+Rebuilding that as our own upload, transcode and delivery pipeline would have meant re-ingesting a catalogue that was already online, a large infrastructure build, and a materially bigger monthly bill — for a service that had not yet taken its first payment. That is the client's money spent on plumbing instead of on launching.
 
-The trade-off is a continued dependency on a third party for the most critical part of the product. For a company running its first streaming service, that's the right trade: predictable monthly cost instead of an infrastructure project, with the budget going into the product.
+So we kept the origin and changed the consumption. Pulling the HLS manifests into our own player kept transcoding and bandwidth costs predictable while moving playback control back inside the product. The trade-off is a continued dependency on a third party for the most critical part of the product, and it is the right trade for a company running its first streaming service: predictable monthly cost instead of an infrastructure project. If the audience grows to the point where owning delivery is cheaper than renting it, that migration can be made later, from a business that is already earning.
 
 </DecisionBand>
 
 ## Since then
 
-We've since built the same architecture for a second client — a video-on-demand service using one-time purchase rather than subscription, where a customer buys a title and can stream it indefinitely. Same delivery approach, different commercial model.
+A company connected to Susila came to us with a second platform, **Home Cinema**, on the same foundation but a different commercial model: instead of a subscription, a customer buys an individual title and can stream it for as long as their account exists — streaming only, no downloads. Same delivery architecture, same access-control approach, purchase-based entitlement rather than recurring.
+
+That project came by referral from a client who had already seen how the first one went.
 
 ## Outcome
 
-The platform went live. It hadn't been deployed before this work — adaptive playback, live streaming and recurring subscriptions all shipped as part of taking it to launch.
-
-Handed over to the client on completion.
+The platform went live. It had never been deployed before this work — access control, recurring billing, adaptive playback and, later, live streaming all shipped as part of taking it to launch, and the catalogue is now run by the client's own team through the admin tools.

@@ -9,8 +9,8 @@
   "contact": {
     "email": "hello@calden.lk",
     "replyTime": "We reply within a day.",
-    "locationShort": "Colombo, Sri Lanka",
-    "locationLong": "Based in Sri Lanka. Working with clients locally and worldwide.",
+    "locationShort": "Matara, Sri Lanka",
+    "locationLong": "Based in Matara, Sri Lanka. Working island-wide and worldwide.",
     "contactPageNote": "Based in Sri Lanka, working with clients locally and worldwide. We reply within a day."
   },
   "whatsapp": {
@@ -46,32 +46,17 @@
     "primaryCta": {
       "label": "Start a project",
       "href": "/contact"
-    },
-    "video": {
-      "enabled": true,
-      "poster": {
-        "src": "/video/hero-poster.jpg",
-        "alt": "",
-        "width": 720,
-        "height": 480
-      },
-      "sources": {
-        "mobile": {
-          "src": "/video/hero-mobile.mp4",
-          "type": "video/mp4",
-          "maxWidth": 819
-        },
-        "desktop": {
-          "src": "/video/hero-desktop.mp4",
-          "type": "video/mp4"
-        }
-      },
-      "scrimOpacity": 0.5
     }
   },
   "homepage": {
     "whatWeDo": {
-      "heading": "What we do"
+      "heading": "What we do",
+      "cta": {
+        "title": "Not sure which you need?",
+        "body": "Tell us what is going wrong, or what you are trying to build. We will tell you honestly which of these fits — or that none of them do.",
+        "label": "Start a conversation",
+        "href": "/contact"
+      }
     },
     "selectedWork": {
       "heading": "Selected work",
@@ -119,8 +104,8 @@
     },
     "about": {
       "eyebrow": "About",
-      "title": "Calden is one person.",
-      "lead": "I design and build websites and software for businesses — from the first conversation through to launch and beyond."
+      "title": "Built properly, start to finish.",
+      "lead": "Calden Digital designs and builds websites, web apps and custom software for businesses — from the first conversation through to launch and beyond."
     },
     "contact": {
       "eyebrow": "Contact",
@@ -142,39 +127,38 @@
     "heading": "Tell us about your project",
     "body": "New site, a system you need built, or you’re not yet sure what you need — send us a message and we’ll tell you honestly whether we can help."
   },
-  "servicesPage": {
-    "takeover": {
-      "heading": "Taking over an existing project",
-      "body": "If you have a build that stalled — a developer who stopped replying, or a project that’s nearly there but not working — we can take it over. We audit what exists, tell you honestly what it needs, and finish it. Two of the projects in our work started this way."
-    }
-  },
   "aboutPage": {
-    "portrait": {
-      "src": "/images/about-portrait.jpg",
-      "alt": "Dilshan Wickramasinghe, founder of Calden Digital",
-      "width": 1000,
-      "height": 1250
+    "vision": {
+      "heading": "Why we exist",
+      "statement": "Software built here should stand next to software built anywhere.",
+      "body": [
+        "Calden Digital is a software studio. We started it because too many businesses had been let down — by templates that could not grow, by agencies that sold to them and handed the work to someone junior, and by developers who stopped replying halfway through.",
+        "We build the way a serious product should be built: understand the business first, design the experience and the architecture together, then write code that is still serviceable years after launch. Not a launch date. A foundation."
+      ]
     },
-    "name": "Dilshan Wickramasinghe",
-    "role": "Developer & founder, Calden Digital",
-    "bio": [
-      "Calden Digital is one person. I started it to do software properly for businesses that had been let down by templates, by agencies that hand you to someone junior, or by developers who stopped replying halfway through.",
-      "I work across the whole thing — understanding the problem, designing the solution, writing the code, and staying on after launch. Because it’s one person, nothing gets lost in a handover, and you always know who you’re talking to."
-    ],
-    "pullQuote": {
-      "statement": "You talk to the person who builds it.",
-      "support": "No account managers. No handover. The person who plans your project is the person who builds it."
-    },
-    "howIWork": {
-      "heading": "How I work",
+    "howWeWork": {
+      "heading": "How we work",
+      "lead": "Design, architecture and testing are part of the build, not extras quoted separately at the end.",
       "items": [
         {
           "title": "Plan before build",
-          "body": "Every project starts with understanding your business and agreeing a scope in writing. You know what you’re getting before anything is made."
+          "body": "Every project starts with understanding your business and agreeing a scope in writing. You know what you are getting before anything is made."
+        },
+        {
+          "title": "UI/UX designed properly",
+          "body": "Interface and experience design done in-house — clear flows, considered detail, and screens your customers can use without being taught."
+        },
+        {
+          "title": "Architecture first",
+          "body": "We design the system before we write it: data models, integrations and structure agreed up front. Good architecture is why a product can grow instead of being rebuilt."
+        },
+        {
+          "title": "Tested before it ships",
+          "body": "QA is a step in the work, not something left to you after launch. Things are checked on real devices and real connections before they go live."
         },
         {
           "title": "Honest about scope",
-          "body": "If something isn’t worth building, or isn’t something I can do well, I’ll say so. A clear no is worth more than a vague yes."
+          "body": "If something is not worth building, or is not something we can do well, we will say so. A clear no is worth more than a vague yes."
         },
         {
           "title": "Built to last",
@@ -182,9 +166,38 @@
         }
       ]
     },
+    "team": {
+      "heading": "An experienced team behind every project",
+      "body": "Design, engineering and QA are handled by people who do that discipline for a living. Your project gets the specialists it needs, when it needs them — and the people who scope it stay with it through delivery.",
+      "disciplines": [
+        "UI/UX design",
+        "Front-end engineering",
+        "Back-end & architecture",
+        "QA & testing",
+        "Deployment & support"
+      ]
+    },
+    "pullQuote": {
+      "statement": "You talk to the people who build it.",
+      "support": "No account managers. No handover to someone junior. The people who plan your project are the people who build it."
+    },
     "location": {
       "heading": "Where we are based",
-      "body": "Based in Colombo, Sri Lanka. Working with clients here and abroad."
+      "body": "Based in Matara, Sri Lanka. We take on projects island-wide and work with clients internationally."
+    },
+    "founder": {
+      "eyebrow": "Founder",
+      "portrait": {
+        "src": "/images/about-portrait.jpg",
+        "alt": "Dilshan Wickramasinghe, Founder and CEO of Calden Digital",
+        "width": 1000,
+        "height": 1250
+      },
+      "name": "Dilshan Wickramasinghe",
+      "role": "Founder & CEO, Calden Digital",
+      "bio": [
+        "Dilshan founded Calden Digital to do software properly for businesses that had been let down elsewhere. He leads the studio's engineering and stays close to the work on every project."
+      ]
     }
   },
   "contactForm": {
@@ -193,6 +206,7 @@
       "Web application",
       "Custom software",
       "Ongoing support",
+      "Fixing an existing project",
       "Not sure yet"
     ],
     "timelines": [
@@ -242,7 +256,7 @@
     "sections": [
       {
         "heading": "Who we are",
-        "body": "Calden Digital is a software studio based in Colombo, Sri Lanka. You can reach us at hello@calden.lk."
+        "body": "Calden Digital is a software studio based in Matara, Sri Lanka. You can reach us at hello@calden.lk."
       },
       {
         "heading": "What we collect",
@@ -311,7 +325,7 @@
       },
       {
         "question": "Do you work with clients outside Sri Lanka?",
-        "answer": "Yes. We’re based in Colombo and work with clients here and abroad. Most communication is over email and WhatsApp, with calls when they’re useful. Time zones have not been a problem so far."
+        "answer": "Yes. We’re based in Matara and take on projects island-wide and internationally. Most communication is over email and WhatsApp, with calls when they’re useful. Time zones have not been a problem so far."
       },
       {
         "question": "Can you take over a project someone else started?",
@@ -319,7 +333,7 @@
       },
       {
         "question": "Who actually does the work?",
-        "answer": "Calden is one person. The person who scopes your project is the person who writes the code and the person you talk to afterwards. No account managers, no handover to someone junior."
+        "answer": "The people who scope your project are the people who write the code and the people you talk to afterwards. No account managers, no handover to someone junior."
       },
       {
         "question": "What happens after launch?",

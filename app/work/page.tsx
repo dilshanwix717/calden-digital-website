@@ -26,7 +26,10 @@ export default function WorkPage() {
     <>
       <Header currentPath="/work" />
       <PageHeader {...pageHeaders.work} />
-      <Section surface="page" className="pb-14 pt-2 sm:pb-24 sm:pt-4">
+      {/* reveal off on the Section: each ProjectRow already reveals itself
+          individually (see ProjectRow.tsx), so the container fading as one
+          block too would double the motion. */}
+      <Section surface="page" reveal={false} className="pb-14 pt-2 sm:pb-24 sm:pt-4">
         <div className="flex flex-col gap-14 desk:gap-[104px]">
           {projects.map((project, i) => (
             <ProjectRow

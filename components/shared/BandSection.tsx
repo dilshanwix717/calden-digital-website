@@ -9,17 +9,25 @@ import { Section } from "@/components/ui/Section";
  */
 export function BandSection({
   id,
+  reveal,
   className,
   containerClassName,
   children,
 }: {
   id?: string;
+  reveal?: boolean;
   className?: string;
   containerClassName?: string;
   children: React.ReactNode;
 }) {
   return (
-    <Section surface="band" id={id} className={className} containerClassName={containerClassName}>
+    <Section
+      surface="band"
+      id={id}
+      reveal={reveal}
+      className={className}
+      containerClassName={containerClassName}
+    >
       {children}
     </Section>
   );

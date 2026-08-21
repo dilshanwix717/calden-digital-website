@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function ServicesPage() {
-  const { pageHeaders, servicesPage } = getSite();
+  const { pageHeaders } = getSite();
   const services = getServices();
 
   return (
@@ -25,11 +25,12 @@ export default function ServicesPage() {
       <Header currentPath="/services" />
       <PageHeader {...pageHeaders.services} />
 
-      <Section surface="page" className="pb-2 pt-0 sm:pb-4">
+      {/* reveal off on the Section: each row below reveals itself individually. */}
+      <Section surface="page" reveal={false} className="pb-2 pt-0 sm:pb-4">
         {services.map((s) => (
           <div
             key={s.slug}
-            className="flex flex-col gap-4 border-t border-line py-9 desk:flex-row desk:gap-16 desk:py-13"
+            className="reveal flex flex-col gap-4 border-t border-line py-9 desk:flex-row desk:gap-16 desk:py-13"
           >
             <div className="flex items-center gap-4 desk:basis-[300px] desk:flex-none desk:items-start">
               <span className="text-sm font-semibold tracking-[0.06em] text-brand">{s.index}</span>
@@ -54,17 +55,6 @@ export default function ServicesPage() {
             </div>
           </div>
         ))}
-      </Section>
-
-      <Section surface="page" className="pb-14 pt-1 sm:pb-24 sm:pt-6" containerClassName="max-w-band">
-        <div className="border-t border-line pt-8 desk:pt-11">
-          <h2 className="text-xl font-semibold tracking-[-0.015em] text-ink desk:text-2xl">
-            {servicesPage.takeover.heading}
-          </h2>
-          <p className="mt-3.5 max-w-[64ch] text-base leading-[1.65] text-muted" style={{ textWrap: "pretty" }}>
-            {servicesPage.takeover.body}
-          </p>
-        </div>
       </Section>
 
       <ContactCTA />

@@ -184,7 +184,7 @@ export function Footer() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] text-on-band-muted underline-offset-4 transition-colors duration-200 hover:text-on-band hover:underline"
+                className="underline-grow text-[13px] text-on-band-muted transition-colors duration-200 hover:text-on-band"
               >
                 {link.label}
               </Link>

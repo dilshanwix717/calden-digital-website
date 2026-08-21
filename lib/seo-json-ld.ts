@@ -55,7 +55,7 @@ export function organizationAndLocalBusinessJsonLd() {
         parentOrganization: { "@id": `${seo.siteUrl}/${ORG_ID}` },
         address: {
           "@type": "PostalAddress",
-          addressLocality: "Colombo",
+          addressLocality: "Matara",
           addressCountry: "LK",
         },
         areaServed: "Worldwide",

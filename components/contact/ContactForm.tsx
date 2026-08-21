@@ -258,7 +258,7 @@ export function ContactForm({
           className="inline-flex items-center justify-center gap-2 rounded-sm border border-brand bg-brand px-[22px] py-3 text-[15px] font-semibold leading-none tracking-[-0.01em] text-on-brand transition-colors duration-200 hover:bg-brand-hover disabled:opacity-40"
         >
           {isPending ? "Sending…" : contactForm.submitLabel}
-          {!isPending && <span aria-hidden="true">→</span>}
+          {!isPending && <span aria-hidden="true" className="arrow">→</span>}
         </button>
         <span className="text-sm text-subtle">{contactForm.replyHint}</span>
       </div>

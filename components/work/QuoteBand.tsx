@@ -2,11 +2,12 @@ import { Section } from "@/components/ui/Section";
 import type { CaseStudyFrontmatter } from "@/lib/schemas";
 
 /**
+ * A null quote is filtered out by the page before this renders at all.
  * When quote.text is null, renders the reserved placeholder in --text-subtle
  * — visually present but NOT wrapped in <blockquote>, because it is not a
  * real quote yet. When text exists, it's a proper <figure><blockquote>.
  */
-export function QuoteBand({ quote }: { quote: CaseStudyFrontmatter["quote"] }) {
+export function QuoteBand({ quote }: { quote: NonNullable<CaseStudyFrontmatter["quote"]> }) {
   return (
     <Section surface="sunken" borderTop borderBottom className="text-center">
       <span aria-hidden="true" className="text-[56px] leading-[0.6] text-brand desk:text-[80px]">

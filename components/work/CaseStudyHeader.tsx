@@ -8,8 +8,9 @@ export function CaseStudyHeader({
   title: string;
   subtitle: string;
 }) {
+  // reveal off — same reasoning as PageHeader: always in the initial viewport.
   return (
-    <Section as="header" surface="page" className="pb-2 pt-10 sm:pb-4 sm:pt-16" containerClassName="max-w-read">
+    <Section as="header" surface="page" reveal={false} className="pb-2 pt-10 sm:pb-4 sm:pt-16" containerClassName="max-w-read">
       <Link href="/work" className="text-sm font-medium text-muted no-underline hover:text-brand">
         ← Work
       </Link>

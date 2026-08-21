@@ -16,7 +16,7 @@ export function StreamingBand() {
       </p>
       <Link href={streaming.linkHref} className="mt-5 inline-block text-[15px] font-semibold text-brand no-underline desk:mt-6">
         {streaming.linkLabel}
-        <span aria-hidden="true">→</span>
+        <span aria-hidden="true" className="arrow">→</span>
       </Link>
     </Section>
   );

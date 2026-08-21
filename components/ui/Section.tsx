@@ -30,6 +30,7 @@ export function Section({
   width = "site",
   borderTop = false,
   borderBottom = false,
+  reveal = true,
   className,
   containerClassName,
   children,
@@ -40,6 +41,12 @@ export function Section({
   width?: Width;
   borderTop?: boolean;
   borderBottom?: boolean;
+  /** Fades and lifts the section as it enters the viewport (see .reveal in
+   * globals.css). Defaults on — nearly every Section is below-the-fold
+   * content. Turned off for anything that's part of the initial viewport
+   * (PageHeader, CaseStudyHeader) or that already carries its own
+   * scroll-driven behaviour (FactsStrip, once sticky). */
+  reveal?: boolean;
   className?: string;
   containerClassName?: string;
   children: React.ReactNode;
@@ -52,6 +59,7 @@ export function Section({
         SURFACE_CLASS[surface],
         borderTop && "border-t border-line",
         borderBottom && "border-b border-line",
+        reveal && "reveal",
         className,
       )}
     >

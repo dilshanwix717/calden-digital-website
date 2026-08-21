@@ -35,7 +35,7 @@ export const proseComponents = {
     <strong className="font-semibold">{children}</strong>
   ),
   a: ({ href, children }: ComponentProps<"a">) => (
-    <a href={href} className="text-brand underline underline-offset-2 hover:text-[var(--brand-teal-hover)]">
+    <a href={href} className="underline-grow text-brand hover:text-[var(--brand-teal-hover)]">
       {children}
     </a>
   ),

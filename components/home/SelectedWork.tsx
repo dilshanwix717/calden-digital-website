@@ -16,7 +16,7 @@ export function SelectedWork() {
           className="hidden text-[15px] font-semibold text-brand no-underline desk:inline"
         >
           {homepage.selectedWork.seeAllLabel}
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true" className="arrow">→</span>
         </Link>
       </div>
 
@@ -31,7 +31,7 @@ export function SelectedWork() {
         className="mt-6 inline-block text-[15px] font-semibold text-brand no-underline desk:hidden"
       >
         {homepage.selectedWork.seeAllLabel}
-        <span aria-hidden="true">→</span>
+        <span aria-hidden="true" className="arrow">→</span>
       </Link>
     </Section>
   );

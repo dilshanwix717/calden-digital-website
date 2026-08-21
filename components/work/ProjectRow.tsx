@@ -34,14 +34,14 @@ export function ProjectRow({
           />
         </div>
       ) : (
-        <Link href={href} className="block">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken">
+        <Link href={href} className="group block">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken transition-colors duration-200 group-hover:border-brand">
             <Image
               src={project.cover.src}
               alt={project.cover.alt}
               fill
               sizes="(max-width: 820px) 100vw, 50vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>
         </Link>
@@ -72,21 +72,37 @@ export function ProjectRow({
       <div className="mt-3.5">
         <Fact label="Stack" value={project.stack.join(" · ")} />
       </div>
-      <div className="mt-6">
+      {/* While a case study is still a draft the row would otherwise dead-end
+          on "coming soon". A live URL gives the reader somewhere to go now. */}
+      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
         {isDraft ? (
           <span className="text-[15px] font-medium text-subtle">Case study coming soon</span>
         ) : (
           <Link href={href} className="text-[15px] font-semibold text-brand no-underline">
             Read case study
-            <span aria-hidden="true">→</span>
+            <span aria-hidden="true" className="arrow">→</span>
           </Link>
+        )}
+        {project.liveUrl && (
+          <a
+            href={project.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[15px] font-semibold text-brand no-underline"
+          >
+            Visit the live site
+            <span aria-hidden="true" className="arrow">
+              {" "}
+              ↗
+            </span>
+          </a>
         )}
       </div>
     </div>
   );
 
   return (
-    <div className={`flex flex-col gap-6 desk:gap-16 ${alternate ? "desk:flex-row-reverse" : "desk:flex-row"}`}>
+    <div className={`reveal flex flex-col gap-6 desk:gap-16 ${alternate ? "desk:flex-row-reverse" : "desk:flex-row"}`}>
       {media}
       {body}
     </div>

@@ -190,31 +190,31 @@
 /* The design system's motion rule: calm and short. Anyone asking for less
    motion gets none. The hero hexagons opt IN via prefers-reduced-motion:
    no-preference rather than being disabled here. */
-/* Hero hexagon pattern (components/home/Hero.tsx). Three rings, each its
-   own rotation direction and duration so they never resynchronise, plus a
-   shared 3% breathing scale. Transform-only, so it's GPU-composited and
-   costs nothing on the main thread. Opt-in via no-preference rather than
-   being switched off elsewhere, so a still frame is the reduced-motion
-   default with zero extra code. */
+/* Hero hexagon pattern (components/home/Hero.tsx). One rule for any number
+   of rings: duration, direction and breathe delay all arrive as custom
+   properties set per ring in the component, so adding a ring there needs no
+   change here. Neighbouring rings counter-rotate, which is what makes the
+   motion legible — same-direction rings at similar speeds read as a single
+   static mass. Transform-only, so it's GPU-composited and costs nothing on
+   the main thread. Opt-in via no-preference rather than being switched off
+   elsewhere, so a still frame is the reduced-motion default with zero extra
+   code. */
 @media (prefers-reduced-motion: no-preference) {
-  .hex-outer { animation: hex-spin-cw 87s linear infinite, hex-breathe 8s ease-in-out infinite; }
-  .hex-mid   { animation: hex-spin-ccw 79s linear infinite, hex-breathe 8s ease-in-out infinite 0.3s; }
-  .hex-inner { animation: hex-spin-cw 70s linear infinite, hex-breathe 8s ease-in-out infinite 0.6s; }
+  .hex-ring {
+    animation: hex-spin var(--hex-dur) linear infinite;
+    animation-direction: var(--hex-dir);
+    /* Promote each ring to its own compositor layer so the browser
+       rasterises the strokes once and then only transforms them on the GPU.
+       Without this the semi-transparent outlines are re-rasterised every
+       frame and the anti-aliasing crawls along the edges. */
+    will-change: transform;
+  }
 }
 
-@keyframes hex-spin-cw {
+@keyframes hex-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-@keyframes hex-spin-ccw {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
-}
-@keyframes hex-breathe {
-  0%, 100% { scale: 1; }
-  50% { scale: 1.03; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -225,3 +225,103 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================================
+   Interaction polish — scroll reveal, hover, arrow nudge, underline.
+   Everything here is transform/opacity/clip-path or background-size, so
+   it's GPU-composited or paint-only, never triggers layout, and every
+   animation (not transition — see below) is scoped inside @media
+   (prefers-reduced-motion: no-preference), matching .hex-ring's precedent:
+   a non-supporting or reduced-motion browser sees the element in its plain
+   final state from first paint, never a hidden/half-drawn one. Short
+   transitions (arrow nudge, underline, hover lift) are NOT re-gated here
+   because the blanket transition-duration: 0.01ms !important rule above
+   already neutralises them for reduced-motion users — that's the existing
+   convention for every hover transition already in this file.
+
+   Native View Transitions and a route-level skeleton loading state were
+   both tried here and both removed. View Transitions wrapped every
+   navigation in document.startViewTransition, resolving its "done" promise
+   two animation frames after calling router.push — fine for an instantly
+   static route, but router.push is async, and any route slow enough to
+   still be rendering when those two frames elapsed left the browser
+   holding a transition open with no stable frame to capture. Chrome's own
+   timeout then aborted it (a real, user-visible "Transition was aborted
+   because of timeout in DOM update" error) and the tab visibly stalled
+   while stuck in that state — that stall was the reported "lag," not
+   anything about page weight. The loading.tsx skeletons turned out to be
+   mostly unreachable besides (see git history on app/loading.tsx for the
+   measurement) and were removed at the same time rather than left half-
+   used. Bridging Next's async client router to a browser API that expects
+   a synchronously-ready DOM update is not solved by tuning the delay
+   further — it needs either React's canary <ViewTransition> integration
+   (not available on the stable channel this site runs) or a real signal
+   for "the new route has committed," neither of which this site had.
+   ========================================================================= */
+
+/* Scroll reveal. animation-timeline: view() ties keyframe progress to the
+   element's own position in the viewport — no IntersectionObserver, no
+   JS, and it costs nothing when unsupported: .reveal/.reveal-image only
+   gain an `animation` property inside this block, so elsewhere they are
+   indistinguishable from a plain div. An element already on screen at load
+   is, per spec, already past the entry point of its range, so it paints
+   fully visible immediately — nothing to flash. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+    .reveal-image {
+      animation: reveal-wipe linear;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes reveal-wipe {
+  from { clip-path: inset(0 0 0 100%); }
+  to   { clip-path: inset(0 0 0 0%); }
+}
+
+/* Arrow nudge. Scoped to a dedicated class, not every "->", so unrelated
+   arrows (the case-study back-link, the stepper's own glyphs) are
+   unaffected. Always inside an <a> or <button> (Button.tsx, or a plain
+   Link), so a bare descendant selector is enough — no `group` class
+   needed at each call site. */
+.arrow {
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+a:hover .arrow,
+a:focus-visible .arrow,
+button:hover .arrow,
+button:focus-visible .arrow {
+  transform: translateX(3px);
+}
+
+/* Gradual underline. A background-image line drawn from 0% to 100% width
+   on hover, rather than the default underline's instant on/off — used for
+   inline text links (prose body copy, footer legal links, the Button
+   "text" variant) in place of hover:underline. */
+.underline-grow {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 250ms ease;
+  text-decoration: none;
+}
+.underline-grow:hover,
+.underline-grow:focus-visible {
+  background-size: 100% 1px;
+}
+
+

@@ -38,10 +38,11 @@ export default function FaqPage() {
       <Header currentPath="/faq" />
       <PageHeader {...pageHeaders.faq} />
 
-      <Section surface="page" className="pb-14 pt-2 sm:pb-24 sm:pt-4" containerClassName="max-w-read">
+      {/* reveal off on the Section: each question reveals itself individually. */}
+      <Section surface="page" reveal={false} className="pb-14 pt-2 sm:pb-24 sm:pt-4" containerClassName="max-w-read">
         <ul className="flex flex-col">
           {faq.items.map((item) => (
-            <li key={item.question} className="border-b border-line first:border-t">
+            <li key={item.question} className="reveal border-b border-line first:border-t">
               <details className="group">
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-lg font-semibold tracking-[-0.01em] text-ink transition-colors duration-200 hover:text-brand [&::-webkit-details-marker]:hidden">
                   {item.question}

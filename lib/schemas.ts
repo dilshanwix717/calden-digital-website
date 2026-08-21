@@ -122,18 +122,20 @@ export const SiteSchema = z.object({
     headline: z.string().min(1),
     subhead: z.string().min(1),
     primaryCta: NavLinkSchema,
-    video: z.object({
-      enabled: z.boolean(),
-      poster: ImageSchema,
-      sources: z.object({
-        mobile: z.object({ src: z.string().min(1), type: z.string().min(1), maxWidth: z.number().int().positive() }),
-        desktop: z.object({ src: z.string().min(1), type: z.string().min(1) }),
-      }),
-      scrimOpacity: z.number().min(0).max(1),
-    }),
   }),
   homepage: z.object({
-    whatWeDo: z.object({ heading: z.string().min(1) }),
+    whatWeDo: z.object({
+      heading: z.string().min(1),
+      // Sixth tile in the 3x2 grid. Not a service — it fills the slot the
+      // five services leave empty and puts a conversion point halfway down
+      // the homepage, where there previously wasn't one.
+      cta: z.object({
+        title: z.string().min(1),
+        body: z.string().min(1),
+        label: z.string().min(1),
+        href: NavHrefSchema,
+      }),
+    }),
     selectedWork: z.object({
       heading: z.string().min(1),
       seeAllLabel: z.string().min(1),
@@ -160,20 +162,34 @@ export const SiteSchema = z.object({
     faq: PageHeaderSchema,
   }),
   contactCta: z.object({ heading: z.string().min(1), body: z.string().min(1) }),
-  servicesPage: z.object({
-    takeover: z.object({ heading: z.string().min(1), body: z.string().min(1) }),
-  }),
   aboutPage: z.object({
-    portrait: ImageSchema,
-    name: z.string().min(1),
-    role: z.string().min(1),
-    bio: z.array(z.string().min(1)).min(1),
-    pullQuote: z.object({ statement: z.string().min(1), support: z.string().min(1) }),
-    howIWork: z.object({
+    vision: z.object({
       heading: z.string().min(1),
+      statement: z.string().min(1),
+      body: z.array(z.string().min(1)).min(1),
+    }),
+    howWeWork: z.object({
+      heading: z.string().min(1),
+      lead: z.string().min(1),
       items: z.array(HomepageWhyItemSchema).min(1),
     }),
+    team: z.object({
+      heading: z.string().min(1),
+      body: z.string().min(1),
+      disciplines: z.array(z.string().min(1)).min(1),
+    }),
+    pullQuote: z.object({ statement: z.string().min(1), support: z.string().min(1) }),
     location: z.object({ heading: z.string().min(1), body: z.string().min(1) }),
+    // Sits last on the page and small by design — the studio leads, the
+    // founder signs off. Kept as its own object so the ordering is obvious
+    // from the shape of the content rather than only from the JSX.
+    founder: z.object({
+      eyebrow: z.string().min(1),
+      portrait: ImageSchema,
+      name: z.string().min(1),
+      role: z.string().min(1),
+      bio: z.array(z.string().min(1)).min(1),
+    }),
   }),
   contactForm: ContactFormOptionsSchema,
   notFound: z.object({
@@ -247,7 +263,7 @@ export const ServiceSchema = z.object({
   body: z.string().min(1),
   includes: z.array(z.string().min(1)).min(1),
 });
-export const ServicesSchema = z.array(ServiceSchema).length(4);
+export const ServicesSchema = z.array(ServiceSchema).length(5);
 export type Service = z.infer<typeof ServiceSchema>;
 
 // ---------------------------------------------------------------------------
@@ -287,6 +303,10 @@ export const ProjectSchema = z.object({
   role: z.string().min(1),
   timeline: z.string().min(1),
   stack: z.array(z.string().min(1)).min(1),
+  // Public URL of the finished site, when there is one to link to. Optional:
+  // client work is often behind a login, taken down, or not launched yet, and
+  // a case study has to stand on its own without it.
+  liveUrl: z.url().optional(),
   cover: ImageSchema,
 });
 
@@ -321,7 +341,10 @@ export type Project = z.infer<typeof ProjectSchema>;
 // ---------------------------------------------------------------------------
 
 const ScreenSchema = z.object({
-  frame: z.enum(["browser", "phone"]),
+  // "none" is for screenshots that already carry their own device mockup —
+  // a laptop or phone rendered into the image itself. Wrapping one of those
+  // in a browser or phone frame draws a second device around the first.
+  frame: z.enum(["browser", "phone", "none"]),
   url: z.string().min(1).optional(),
   image: ImageSchema,
   caption: z.string().min(1),
@@ -342,10 +365,15 @@ export const CaseStudyFrontmatterSchema = z.object({
     statement: z.string().nullable(),
   }),
   screens: z.array(ScreenSchema),
-  quote: z.object({
-    text: z.string().nullable(),
-    attribution: z.string().min(1),
-  }),
+  // null omits the band entirely. text: null keeps the band and shows the
+  // "space reserved" placeholder, which is only wanted while a quote is
+  // genuinely still expected — otherwise it advertises a gap.
+  quote: z
+    .object({
+      text: z.string().nullable(),
+      attribution: z.string().min(1),
+    })
+    .nullable(),
   anonymised: z.boolean(),
   draft: z.boolean(),
   publishedAt: z.iso.date(),
