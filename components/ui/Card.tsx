@@ -16,10 +16,14 @@ export function Card({
   className?: string;
   children: React.ReactNode;
 }) {
-  const base = "rounded-md border border-line bg-surface transition-colors duration-200";
+  const base =
+    "rounded-md border border-line bg-surface transition-colors duration-200";
   if (Tag === "a" && href) {
     return (
-      <a href={href} className={cn(base, "block hover:border-line-control", className)}>
+      <a
+        href={href}
+        className={cn(base, "block hover:border-line-control", className)}
+      >
         {children}
       </a>
     );

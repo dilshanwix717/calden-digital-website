@@ -121,13 +121,21 @@ function openHex(r: number) {
   return `M${pts.join(" L")}`;
 }
 
+/**
+ * hidden below desk (820px) — removed on mobile on request. Rings at this
+ * radius range were tuned for a wide hero; on a narrow viewport most of the
+ * pattern falls outside the visible band anyway (see the geometry note
+ * above on RINGS), so little was actually being shown there before this.
+ * display:none also means zero animation cost on mobile, not just an
+ * invisible one.
+ */
 function HexPattern() {
   return (
     <svg
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className="pointer-events-none absolute inset-0 hidden h-full w-full desk:block"
     >
       {RINGS.map((ring) => (
         <g

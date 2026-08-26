@@ -24,7 +24,7 @@ export function WhatWeDo() {
       <h2 className="t-h2 text-ink">{homepage.whatWeDo.heading}</h2>
       <div className="mt-7 grid grid-cols-1 gap-3 desk:mt-11 desk:grid-cols-3 desk:gap-5">
         {services.map((s) => (
-          <div className="reveal flex flex-col gap-4 rounded-md border border-line bg-surface p-8 transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-brand" key={s.slug}>
+          <div className="reveal flex flex-col gap-4 rounded-md border border-line bg-surface p-8 transition-[translate,border-color] duration-500 ease-out hover:-translate-y-1 hover:border-brand" key={s.slug}>
             <div className="flex items-center gap-3">
               <span className="text-[13px] font-semibold tracking-[0.06em] text-brand">{s.index}</span>
               <span className="h-px flex-1 bg-line" />
@@ -36,7 +36,7 @@ export function WhatWeDo() {
 
         <Link
           href={cta.href}
-          className="reveal flex flex-col gap-4 rounded-md border border-brand bg-[color-mix(in_srgb,var(--brand-teal)_5%,var(--surface-card))] p-8 transition-[transform,background-color] duration-200 hover:-translate-y-1 hover:bg-[color-mix(in_srgb,var(--brand-teal)_9%,var(--surface-card))]"
+          className="reveal flex flex-col gap-4 rounded-md border border-brand bg-[color-mix(in_srgb,var(--brand-teal)_5%,var(--surface-card))] p-8 transition-[translate,background-color] duration-500 ease-out hover:-translate-y-1 hover:bg-[color-mix(in_srgb,var(--brand-teal)_9%,var(--surface-card))]"
         >
           <h3 className="text-xl font-semibold tracking-[-0.01em] text-ink">{cta.title}</h3>
           <p className="t-small max-w-[46ch] text-muted">{cta.body}</p>

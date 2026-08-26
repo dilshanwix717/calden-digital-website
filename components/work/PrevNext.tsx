@@ -8,7 +8,7 @@ export function PrevNext({ prev, next }: { prev: Project; next: Project }) {
       <div className="grid grid-cols-1 gap-3 desk:grid-cols-2 desk:gap-6">
         <Link
           href={`/work/${prev.slug}`}
-          className="block rounded-md border border-line bg-surface p-5 no-underline transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-brand desk:p-7"
+          className="block rounded-md border border-line bg-surface p-5 no-underline transition-[translate,border-color] duration-500 ease-out hover:-translate-y-1 hover:border-brand desk:p-7"
         >
           <span className="text-[13px] font-semibold uppercase tracking-[0.04em] text-brand">
             ← Previous
@@ -20,7 +20,7 @@ export function PrevNext({ prev, next }: { prev: Project; next: Project }) {
         </Link>
         <Link
           href={`/work/${next.slug}`}
-          className="block rounded-md border border-line bg-surface p-5 text-right no-underline transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-brand desk:p-7"
+          className="block rounded-md border border-line bg-surface p-5 text-right no-underline transition-[translate,border-color] duration-500 ease-out hover:-translate-y-1 hover:border-brand desk:p-7"
         >
           <span className="text-[13px] font-semibold uppercase tracking-[0.04em] text-brand">
             Next →

@@ -7,15 +7,12 @@ import type { CaseStudyFrontmatter } from "@/lib/schemas";
  * property of the project, not of the write-up, and the work index needs the
  * same value. One source in projects.json, rendered in both places.
  *
- * Sticky, pinned directly under Nav (top offset matches Nav's own height —
- * 60px mobile, 76px desk) so Role/Timeline/Stack/Live-site stay visible
- * while the reader scrolls the article body below. z-10, one below Nav's
- * z-20, so it layers under the nav but over the scrolling content; bg-sunken
- * is opaque so nothing shows through the seam. reveal={false}: this sits
- * directly under CaseStudyHeader, always in the initial viewport, and
- * layering the scroll-reveal animation onto an element that's ALSO
- * scroll-linked via position: sticky is exactly the kind of two-scroll-
- * effects-on-one-element interaction not worth the fragility.
+ * reveal={false}: this sits directly under CaseStudyHeader, always in the
+ * initial viewport, so there's nothing for a scroll-triggered fade to
+ * reveal — same reasoning as PageHeader and CaseStudyHeader.
+ *
+ * Was sticky (pinned under Nav while the article body scrolled past) —
+ * removed on request. Plain flow now.
  */
 export function FactsStrip({
   facts,
@@ -36,7 +33,7 @@ export function FactsStrip({
       borderTop
       borderBottom
       reveal={false}
-      className="sticky top-[60px] z-10 py-8 desk:top-[76px] desk:py-10"
+      className="py-8 desk:py-10"
     >
       <div
         className={

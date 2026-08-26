@@ -53,7 +53,7 @@ export function buildContactSchema({ projectTypes, timelines, budgets }: Contact
     budget: z.enum(budgets, { error: "Please choose a budget range." }),
     message: z.string().check(
       z.trim(),
-      z.minLength(20, { error: "Please tell us a little more — 20 characters or so." }),
+      z.minLength(1, { error: "Please enter a message." }),
       z.maxLength(4000),
     ),
   });

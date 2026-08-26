@@ -35,13 +35,13 @@ export function ProjectRow({
         </div>
       ) : (
         <Link href={href} className="group block">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken transition-colors duration-200 group-hover:border-brand">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-sunken transition-colors duration-300 ease-out group-hover:border-brand">
             <Image
               src={project.cover.src}
               alt={project.cover.alt}
               fill
               sizes="(max-width: 820px) 100vw, 50vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             />
           </div>
         </Link>
