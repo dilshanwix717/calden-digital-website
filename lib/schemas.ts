@@ -89,7 +89,13 @@ export const SiteSchema = z.object({
   company: z.object({
     name: z.string().min(1),
     shortName: z.string().min(1),
+    // The two brand slogans. `tagline` is the short positioning line
+    // (footer lockup, About page header); `promise` is the longer
+    // capability line (hero subhead, meta description, JSON-LD slogan).
+    // Both are content, not decoration — every surface that shows one
+    // reads it from here so the wording changes in exactly one place.
     tagline: z.string().min(1),
+    promise: z.string().min(1),
     description: z.string().min(1),
     foundedYear: z.number().int(),
   }),
@@ -141,7 +147,7 @@ export const SiteSchema = z.object({
       seeAllLabel: z.string().min(1),
       seeAllHref: z.string().startsWith("/"),
     }),
-    streaming: z.object({
+    capability: z.object({
       heading: z.string().min(1),
       body: z.string().min(1),
       linkLabel: z.string().min(1),

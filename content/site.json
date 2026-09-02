@@ -3,7 +3,8 @@
     "name": "Calden Digital",
     "shortName": "Calden",
     "tagline": "Building the digital foundation for modern businesses",
-    "description": "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
+    "promise": "Designing modern, reliable and user-friendly websites and software for businesses",
+    "description": "Designing modern, reliable and user-friendly websites and software for businesses. A software studio in Sri Lanka — we plan, design and build custom websites, web applications and software for businesses here and abroad.",
     "foundedYear": 2024
   },
   "contact": {
@@ -41,8 +42,8 @@
     }
   ],
   "hero": {
-    "headline": "We design and build websites, web apps and custom software.",
-    "subhead": "A software studio in Sri Lanka. We work through the whole process — understanding what your business needs, designing it, and building it properly.",
+    "headline": "Building the digital foundation for modern businesses",
+    "subhead": "Designing modern, reliable and user-friendly websites and software for businesses",
     "primaryCta": {
       "label": "Start a project",
       "href": "/contact"
@@ -63,9 +64,9 @@
       "seeAllLabel": "See all work",
       "seeAllHref": "/work"
     },
-    "streaming": {
-      "heading": "We’ve built streaming platforms",
-      "body": "Video is one of the harder things to get right — it has to adapt to the viewer’s connection, and it has to do it without an infrastructure bill that sinks the business. We’ve delivered video-on-demand and live streaming for two media companies, on two different commercial models.",
+    "capability": {
+      "heading": "Software that moves the business forward",
+      "body": "The useful question is not which technologies we know — it is what is costing you money or time right now. One client had a subscription platform where the pricing page took no payment and nothing checked who was entitled to watch. We rebuilt the billing, the access control and the delivery, and turned it into a product that actually earns. Whatever your process looks like, we can build software shaped around it.",
       "linkLabel": "See how we did it",
       "linkHref": "/work/susila"
     },
@@ -105,7 +106,7 @@
     "about": {
       "eyebrow": "About",
       "title": "Built properly, start to finish.",
-      "lead": "Calden Digital designs and builds websites, web apps and custom software for businesses — from the first conversation through to launch and beyond."
+      "lead": "Designing modern, reliable and user-friendly websites and software for businesses. Calden Digital works from the first conversation through to launch and beyond."
     },
     "contact": {
       "eyebrow": "Contact",
@@ -300,7 +301,7 @@
     "siteUrl": "https://calden.lk",
     "defaultTitle": "Calden — Web design and software development in Sri Lanka",
     "titleTemplate": "%s — Calden Digital",
-    "defaultDescription": "A software studio in Sri Lanka. We plan, design and build custom websites, web applications and software for businesses here and abroad.",
+    "defaultDescription": "Designing modern, reliable and user-friendly websites and software for businesses. A software studio in Sri Lanka, working with clients here and abroad.",
     "defaultOgImage": {
       "src": "/images/og/default.png",
       "width": 1200,

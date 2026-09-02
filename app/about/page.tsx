@@ -26,7 +26,7 @@ export function generateMetadata(): Metadata {
  * people who scope a project are the people who deliver it.
  */
 export default function AboutPage() {
-  const { pageHeaders, aboutPage } = getSite();
+  const { pageHeaders, aboutPage, company } = getSite();
   const { vision, howWeWork, team, pullQuote, location, founder } = aboutPage;
 
   return (
@@ -49,6 +49,14 @@ export default function AboutPage() {
             </p>
           ))}
         </div>
+        {/* The tagline closes this section rather than opening the page: the
+            copy above ends on "Not a launch date. A foundation." — the
+            strapline lands as the conclusion of that argument instead of an
+            unearned claim before it. Rule + brand colour so it reads as a
+            signature line, not another paragraph. */}
+        <p className="mt-8 border-t border-line pt-6 text-[19px] font-semibold leading-[1.4] tracking-[-0.015em] text-brand desk:mt-11 desk:pt-7 desk:text-[22px]">
+          {company.tagline}
+        </p>
       </Section>
 
       {/* reveal off on the Section: each item below reveals itself individually. */}

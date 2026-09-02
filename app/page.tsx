@@ -4,7 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { WhatWeDo } from "@/components/home/WhatWeDo";
 import { HowWeWork } from "@/components/home/HowWeWork";
 import { SelectedWork } from "@/components/home/SelectedWork";
-import { StreamingBand } from "@/components/home/StreamingBand";
+import { CapabilityBand } from "@/components/home/CapabilityBand";
 import { WhyCalden } from "@/components/home/WhyCalden";
 import { ContactSection } from "@/components/home/ContactSection";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -37,7 +37,7 @@ export default function Page() {
       <WhatWeDo />
       <HowWeWork />
       <SelectedWork />
-      <StreamingBand />
+      <CapabilityBand />
       <WhyCalden />
       <ContactSection />
     </>

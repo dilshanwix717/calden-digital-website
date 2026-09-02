@@ -34,6 +34,9 @@ export function organizationAndLocalBusinessJsonLd() {
         name: company.name,
         url: seo.siteUrl,
         logo: logoUrl,
+        // schema.org/slogan — a real property search engines read for
+        // knowledge-panel copy. The brand tagline is exactly what it's for.
+        slogan: company.tagline,
         description: company.description,
         email: contact.email,
         foundingDate: String(company.foundedYear),
